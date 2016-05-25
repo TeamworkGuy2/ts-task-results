@@ -1,0 +1,13 @@
+{
+  "name": "ts-task-results",
+  "version": "0.1.0",
+  "description": "Task and result tracking, used to augment callback functions and return/throw code with trackable changes",
+  "dependencies": {
+    "ts-mortar": "~0.7.0",
+    "q": "^1.1.2"
+  },
+  "devDependencies": {
+    "qunit": "~0.9.1",
+    "typescript": "~1.8.9"
+  }
+}
