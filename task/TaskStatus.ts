@@ -4,14 +4,7 @@
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
-class TaskStatus implements EnumCreator.EnumConstant {
-
-    private static TaskPhase = {
-        CREATED: {},
-        RUNNING: {},
-        SETTLED: {},
-    };
-
+class TaskStatus {
     static CANCELED: TaskStatus;
     static CREATED: TaskStatus;
     static ERRORED: TaskStatus;
@@ -21,43 +14,46 @@ class TaskStatus implements EnumCreator.EnumConstant {
     static AWAITING_CHILDREN_COMPLETION: TaskStatus;
     static AWAITING_EXECUTION: TaskStatus;
 
-    static isInstance(obj): boolean { return null; }
-    static values(): TaskStatus[] { return null; }
-    static parse(name: string): TaskStatus { return null; }
 
-    public name(): string { return null; }
+    private phase: any;
 
-
-    private static Cctor = (function () {
-        EnumCreator.initEnumClass(TaskStatus, TaskStatus, () => [
-            TaskStatus.CANCELED = new TaskStatus("CANCELED", TaskStatus.TaskPhase.SETTLED),
-            TaskStatus.CREATED = new TaskStatus("CREATED", TaskStatus.TaskPhase.CREATED),
-            TaskStatus.ERRORED = new TaskStatus("ERRORED", TaskStatus.TaskPhase.SETTLED),
-            TaskStatus.COMPLETED = new TaskStatus("COMPLETED", TaskStatus.TaskPhase.SETTLED),
-            TaskStatus.RUNNING = new TaskStatus("RUNNING", TaskStatus.TaskPhase.RUNNING),
-            TaskStatus.AWAITING_SCHEDULING = new TaskStatus("AWAITING_SCHEDULING", TaskStatus.TaskPhase.RUNNING),
-            TaskStatus.AWAITING_CHILDREN_COMPLETION = new TaskStatus("AWAITING_CHILDREN_COMPLETION", TaskStatus.TaskPhase.RUNNING),
-            TaskStatus.AWAITING_EXECUTION = new TaskStatus("AWAITING_EXECUTION", TaskStatus.TaskPhase.RUNNING),
-        ]);
-    } ());
-
-
-    private phase;
-
-    constructor(name: string, phase) {
-        EnumCreator.EnumConstantImpl.call(this, name);
+    constructor(phase: any) {
+        this.phase = phase;
     }
 
 
     isSettled() {
-        return this.phase === TaskStatus.TaskPhase.SETTLED;
+        return this.phase === TaskPhase.SETTLED;
     }
 
 
     isRunning() {
-        return this.phase === TaskStatus.TaskPhase.RUNNING;
+        return this.phase === TaskPhase.RUNNING;
     }
 
 }
 
-export = TaskStatus;
+
+var TaskPhase = {
+    CREATED: {},
+    RUNNING: {},
+    SETTLED: {},
+};
+
+
+var TaskStatusEnum = EnumCreator.initEnumClass(TaskStatus, TaskStatus, (toMember) => {
+    return {
+        CANCELED: toMember(new TaskStatus(TaskPhase.SETTLED)),
+        CREATED: toMember(new TaskStatus(TaskPhase.CREATED)),
+        ERRORED: toMember(new TaskStatus(TaskPhase.SETTLED)),
+        COMPLETED: toMember(new TaskStatus(TaskPhase.SETTLED)),
+        RUNNING: toMember(new TaskStatus(TaskPhase.RUNNING)),
+        AWAITING_SCHEDULING: toMember(new TaskStatus(TaskPhase.RUNNING)),
+        AWAITING_CHILDREN_COMPLETION: toMember(new TaskStatus(TaskPhase.RUNNING)),
+        AWAITING_EXECUTION: toMember(new TaskStatus(TaskPhase.RUNNING)),
+    };
+});
+
+type TaskStatusEnum = TaskStatus & EnumCreator.EnumMember;
+
+export = TaskStatusEnum;
