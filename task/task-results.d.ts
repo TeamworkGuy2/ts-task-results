@@ -1,4 +1,5 @@
-﻿
+﻿/// <reference path="../../definitions/lib/Q.d.ts" />
+
 /**
  * @param <R> the result type
  * @param <E> the error type

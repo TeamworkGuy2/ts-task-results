@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.1](N/A) - 2016-05-25
+### [0.1.2](N/A) - 2016-05-28
+#### Changed
+* Switched unit tests from qunit to chai and mocha and moved test/task/ test files into root test/ directory
+
+
+--------
+### [0.1.1](https://github.com/TeamworkGuy2/ts-task-results/commit/84d099bc92572e687dbd8889f4182773b8a17690) - 2016-05-25
 #### Changed
 * Updated to use latest version of EnumCreator from ts-mortar
 
