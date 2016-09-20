@@ -1,14 +1,14 @@
 {
   "name": "ts-task-results",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Task and result tracking, used to augment callback functions and return/throw code with trackable changes",
   "dependencies": {
-    "ts-mortar": "~0.7.1",
-    "q": "^1.1.2"
+    "ts-mortar": "~0.11.0",
+    "q": "~1.4.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "~2.5.0",
+    "mocha": "~3.0.2",
     "typescript": "~1.8.9"
   },
   "scripts": {

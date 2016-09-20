@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.2](N/A) - 2016-05-28
+### [0.1.3](N/A) - 2016-09-19
+#### Changed
+* Updated dependencies 'ts-mortar' to 0.11.0, 'q' to 1.4.1, and 'mocha' to 3.0.2 latest versions
+
+
+--------
+### [0.1.2](https://github.com/TeamworkGuy2/ts-task-results/commit/f75b9c2682b0f5e85986e8791e85311281c3ccc9) - 2016-05-28
 #### Changed
 * Switched unit tests from qunit to chai and mocha and moved test/task/ test files into root test/ directory
 
