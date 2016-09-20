@@ -1,4 +1,4 @@
-﻿/// <reference path="../../definitions/lib/Q.d.ts" />
+﻿/// <reference path="../../definitions/q/Q.d.ts" />
 
 /**
  * @param <R> the result type
