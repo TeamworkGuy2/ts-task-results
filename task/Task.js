@@ -17,38 +17,6 @@ var Task = (function () {
         this._status = TaskStatus.CREATED;
         this.start = this.start.bind(this);
     }
-    Task.prototype.start = function () {
-        var that = this;
-        if (this._status !== TaskStatus.CREATED) {
-            throw new Error("task has already been started, cannot start task more than once");
-        }
-        function completedCb(res) {
-            that._status = TaskStatus.COMPLETED;
-            that.result = res;
-            that.actionDfd.resolve(res);
-        }
-        function erroredCb(err) {
-            that._status = TaskStatus.ERRORED;
-            that.error = err;
-            that.actionDfd.reject(err);
-        }
-        this._status = TaskStatus.AWAITING_EXECUTION;
-        if (this.isPromise) {
-            this._status = TaskStatus.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
-            this.action.then(completedCb, erroredCb);
-        }
-        else {
-            try {
-                this._status = TaskStatus.RUNNING;
-                var res = this.action();
-                completedCb(res);
-            }
-            catch (e) {
-                erroredCb(e);
-            }
-        }
-        return this.actionDfd.promise;
-    };
     Object.defineProperty(Task.prototype, "status", {
         get: function () {
             return this._status;
@@ -63,6 +31,38 @@ var Task = (function () {
         enumerable: true,
         configurable: true
     });
+    Task.prototype.start = function () {
+        var that = this;
+        if (this._status !== TaskStatus.CREATED) {
+            throw new Error("task has already been started, cannot start task more than once");
+        }
+        function taskCompleted(res) {
+            that._status = TaskStatus.COMPLETED;
+            that.result = res;
+            that.actionDfd.resolve(res);
+        }
+        function taskErrored(err) {
+            that._status = TaskStatus.ERRORED;
+            that.error = err;
+            that.actionDfd.reject(err);
+        }
+        this._status = TaskStatus.AWAITING_EXECUTION;
+        if (this.isPromise) {
+            this._status = TaskStatus.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
+            this.action.then(taskCompleted, taskErrored);
+        }
+        else {
+            try {
+                this._status = TaskStatus.RUNNING;
+                var res = this.action();
+                taskCompleted(res);
+            }
+            catch (e) {
+                taskErrored(e);
+            }
+        }
+        return this.actionDfd.promise;
+    };
     Task.prototype.isSettled = function () {
         return this._status.isSettled();
     };
@@ -78,12 +78,4 @@ var Task = (function () {
     Task.isPromise = Q.isPromiseAlike;
     return Task;
 }());
-var Task;
-(function (Task) {
-    function newInst(name, action, dfd) {
-        if (dfd === void 0) { dfd = Q.defer(); }
-        return new Task(name, action, dfd);
-    }
-    Task.newInst = newInst;
-})(Task || (Task = {}));
 module.exports = Task;

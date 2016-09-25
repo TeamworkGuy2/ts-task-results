@@ -4,7 +4,16 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.3](https://github.com/TeamworkGuy2/ts-task-results/commit/d945fec1d81030988f8e299c76eb1d76ab3dce00) - 2016-09-19
+### [0.1.4](N/A) - 2016-09-24
+#### Added
+* Added TaskSet for creating and handling lists of Tasks
+
+#### Removed
+ * Task.newInst() - use 'new Task()'
+
+
+--------
+### [0.1.3](https://github.com/TeamworkGuy2/ts-task-results/commit/7b1ce2a24f891e562a88fe330984c6204a6168ed) - 2016-09-19
 #### Changed
 * Updated dependencies 'ts-mortar' to 0.11.0, 'q' to 1.4.1, and 'mocha' to 3.0.2 latest versions
 

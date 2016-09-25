@@ -14,7 +14,7 @@ suite("Task", function TaskTest() {
 
     test("task-success", function taskSuccessTest(done) {
         // test success
-        var res1 = Task.newInst("a", () => "a-success");
+        var res1 = new Task("a", () => "a-success");
 
         asr.equal(res1.name, "a");
         asr.equal(res1.status, TaskStatus.CREATED);
@@ -35,7 +35,7 @@ suite("Task", function TaskTest() {
 
     test("task-failure", function taskFailureTest(done) {
         // test failure
-        var res1 = Task.newInst("a", () => { throw "a-error"; });
+        var res1 = new Task("a", () => { throw "a-error"; });
 
         asr.equal(res1.name, "a");
         asr.equal(res1.status, TaskStatus.CREATED);

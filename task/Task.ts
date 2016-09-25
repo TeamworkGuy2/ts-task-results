@@ -8,7 +8,7 @@ import TaskStatus = require("./TaskStatus");
  * @since 2016-5-24
  */
 class Task<R, S> {
-    public static isPromise: (ob: any) => boolean = Q.isPromiseAlike;
+    public static isPromise: (obj: any) => obj is Q.IPromise<any> = <any>Q.isPromiseAlike;
 
     private action: (() => R) | Q.IPromise<R>;
     private isPromise: boolean;
@@ -30,19 +30,28 @@ class Task<R, S> {
     }
 
 
-    start(): Q.IPromise<R> {
+    get status(): TaskStatus {
+        return this._status;
+    }
+
+    get name(): string {
+        return this._name;
+    }
+
+
+    public start(): Q.IPromise<R> {
         var that = this;
         if (this._status !== TaskStatus.CREATED) {
             throw new Error("task has already been started, cannot start task more than once");
         }
 
-        function completedCb(res) {
+        function taskCompleted(res: R) {
             that._status = TaskStatus.COMPLETED;
             that.result = res;
             that.actionDfd.resolve(res);
         }
 
-        function erroredCb(err) {
+        function taskErrored(err) {
             that._status = TaskStatus.ERRORED;
             that.error = err;
             that.actionDfd.reject(err);
@@ -52,15 +61,15 @@ class Task<R, S> {
 
         if (this.isPromise) {
             this._status = TaskStatus.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
-            (<Q.IPromise<R>><any>this.action).then(completedCb, erroredCb);
+            (<Q.IPromise<R>><any>this.action).then(taskCompleted, taskErrored);
         }
         else {
             try {
                 this._status = TaskStatus.RUNNING;
                 var res = (<() => R><any>this.action)();
-                completedCb(res);
+                taskCompleted(res);
             } catch (e) {
-                erroredCb(e);
+                taskErrored(e);
             }
         }
 
@@ -68,27 +77,22 @@ class Task<R, S> {
     }
 
 
-    get status(): TaskStatus {
-        return this._status;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    isSettled(): boolean {
+    public isSettled(): boolean {
         return this._status.isSettled();
     }
 
-    getPromise(): Task.Promise<R, S> {
+
+    public getPromise(): Task.Promise<R, S> {
         return this.actionDfd.promise;
     }
 
-    getResult(): R {
+
+    public getResult(): R {
         return this.result;
     }
 
-    getError(): S {
+
+    public getError(): S {
         return this.error;
     }
 
@@ -110,13 +114,6 @@ module Task {
     export interface Deferred<T, R> extends Q.Deferred<T> {
         promise: Task.Promise<T, R>;
         reject(reason: R): void;
-    }
-
-
-
-
-    export function newInst<R1>(name: string, action: (() => R1) | Q.IPromise<R1>, dfd: Q.Deferred<R1> = Q.defer<R1>()) {
-        return new Task(name, action, dfd);
     }
 
 }

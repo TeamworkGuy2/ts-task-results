@@ -8,7 +8,7 @@ var asr = chai.assert;
 suite("Task", function TaskTest() {
     test("task-success", function taskSuccessTest(done) {
         // test success
-        var res1 = Task.newInst("a", function () { return "a-success"; });
+        var res1 = new Task("a", function () { return "a-success"; });
         asr.equal(res1.name, "a");
         asr.equal(res1.status, TaskStatus.CREATED);
         res1.getPromise().then(function (res) {
@@ -24,7 +24,7 @@ suite("Task", function TaskTest() {
     });
     test("task-failure", function taskFailureTest(done) {
         // test failure
-        var res1 = Task.newInst("a", function () { throw "a-error"; });
+        var res1 = new Task("a", function () { throw "a-error"; });
         asr.equal(res1.name, "a");
         asr.equal(res1.status, TaskStatus.CREATED);
         res1.getPromise().then(function (res) {
