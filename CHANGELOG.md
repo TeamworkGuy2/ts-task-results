@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.4](N/A) - 2016-09-24
+### [0.1.5](N/A) - 2016-09-27
+#### Added
+* TaskSet support for accessing the list of completed tasks and controlling the size and clearing behavior of the list of completed tasks
+  * new maxCompletedTasks and dropCompletedTasksPercentage public properties (these are public, but may be moved to getters/setters or get renamed in future)
+  * new getCompletedTasks(), clearCompletedTasks(), and getCompletedTaskCount() methods
+
+
+--------
+### [0.1.4](https://github.com/TeamworkGuy2/ts-task-results/commit/277d8f51441b3ceec8bb0d592efffb7bf9f8e109) - 2016-09-24
 #### Added
 * Added TaskSet for creating and handling lists of Tasks
 

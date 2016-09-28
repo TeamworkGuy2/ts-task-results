@@ -10,10 +10,18 @@ import Task = require("./Task");
  * @param <S> the type of error throw by the tasks in this task set
  */
 class TaskSet<T, S> {
-    private static MAX_COMPLETED_TASKS_HISTORY = 200;
-    private tasksInProgress: Map<string, Task<T, S>>;
-    private tasksComplete: { name: string; task: Task<T, S> }[];
+    /** The maximum number of completed tasks which can be saved by this task set and retrieved via {@code getCompletedTasks()}.
+     * If this value is 0, then no task history is kept.
+     * If this value is -1, then all task history is kept
+     */
+    public maxCompletedTasks: number = 200;
+    /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it becomes full. Must be between [0, 1]
+     */
+    public dropCompletedTasksPercentage: number = 0.5;
 
+    private tasksInProgress: Map<string, Task<T, S>>;
+    private tasksCompleted: { name: string; task: Task<T, S> }[];
+    private tasksCompletedCount: number = 0;
     private taskStartedCallback: (taskName: string) => void;
     private taskCompletedCallback: (taskName: string) => void;
     private taskFailedCallback: (taskName: string) => void;
@@ -26,7 +34,7 @@ class TaskSet<T, S> {
      */
     constructor(taskStartedCb?: (taskName: string) => void, taskCompletedCb?: (taskName: string) => void, taskFailedCb?: (taskName: string) => void) {
         this.tasksInProgress = new Map<string, Task<T, S>>();
-        this.tasksComplete = [];
+        this.tasksCompleted = [];
         this.taskStartedCallback = taskStartedCb;
         this.taskCompletedCallback = taskCompletedCb;
         this.taskFailedCallback = taskFailedCb;
@@ -63,6 +71,29 @@ class TaskSet<T, S> {
     public setTaskFailedCallback(cb: (taskname: string) => void): void {
         TaskSet.checkCallback(cb, "task failed");
         this.taskFailedCallback = cb;
+    }
+
+
+    /** @return a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
+     * @ee #getMaxTasksCompletedSize()
+     */
+    public getCompletedTasks(): { name: string; task: Task<T, S> }[] {
+        return this.tasksCompleted;
+    }
+
+
+    /** Clear the completed tasks array and reset the completed task count to 0
+     */
+    public clearCompletedTasks(): void {
+        this.tasksCompleted = [];
+        this.tasksCompletedCount = 0;
+    }
+
+
+    /** This is the total number of tasks completed regardless of the max tasks completed limit
+     */
+    public getCompletedTaskCount(): number {
+        return this.tasksCompletedCount;
     }
 
 
@@ -115,14 +146,7 @@ class TaskSet<T, S> {
 
         function taskDone<E1>(res: E1): E1 {
             // keep a log of completed tasks
-            that.tasksComplete.push({
-                name: taskName,
-                task: newTask
-            });
-            // drop the older half of the task history array when full
-            if (that.tasksComplete.length > TaskSet.MAX_COMPLETED_TASKS_HISTORY) {
-                that.tasksComplete = that.tasksComplete.slice(that.tasksComplete.length / 2, that.tasksComplete.length);
-            }
+            that.saveCompletedTask(taskName, newTask);
 
             // remove the completed task
             that.tasksInProgress.delete(taskName);
@@ -158,6 +182,25 @@ class TaskSet<T, S> {
         this.callTaskStarted(taskName);
 
         return newTask;
+    }
+
+
+    private saveCompletedTask(taskName: string, newTask: Task<T, S>) {
+        this.tasksCompletedCount++;
+
+        if (this.maxCompletedTasks !== 0) {
+            this.tasksCompleted.push({
+                name: taskName,
+                task: newTask
+            });
+            // drop the older half of the task history array when full
+            var taskCount = this.tasksCompleted.length;
+            if (this.maxCompletedTasks > -1 && taskCount > this.maxCompletedTasks) {
+                var mustDrop = taskCount - this.maxCompletedTasks;
+                var percentCount = Math.round(this.maxCompletedTasks * this.dropCompletedTasksPercentage);
+                this.tasksCompleted = this.tasksCompleted.slice(mustDrop + percentCount, taskCount);
+            }
+        }
     }
 
 

@@ -14,8 +14,17 @@ var TaskSet = (function () {
      * @param [taskFailedCb] a function to call when a task fails
      */
     function TaskSet(taskStartedCb, taskCompletedCb, taskFailedCb) {
+        /** The maximum number of completed tasks which can be saved by this task set and retrieved via {@code getCompletedTasks()}.
+         * If this value is 0, then no task history is kept.
+         * If this value is -1, then all task history is kept
+         */
+        this.maxCompletedTasks = 200;
+        /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it becomes full. Must be between [0, 1]
+         */
+        this.dropCompletedTasksPercentage = 0.5;
+        this.tasksCompletedCount = 0;
         this.tasksInProgress = new Map();
-        this.tasksComplete = [];
+        this.tasksCompleted = [];
         this.taskStartedCallback = taskStartedCb;
         this.taskCompletedCallback = taskCompletedCb;
         this.taskFailedCallback = taskFailedCb;
@@ -40,6 +49,23 @@ var TaskSet = (function () {
     TaskSet.prototype.setTaskFailedCallback = function (cb) {
         TaskSet.checkCallback(cb, "task failed");
         this.taskFailedCallback = cb;
+    };
+    /** @return a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
+     * @ee #getMaxTasksCompletedSize()
+     */
+    TaskSet.prototype.getCompletedTasks = function () {
+        return this.tasksCompleted;
+    };
+    /** Clear the completed tasks array and reset the completed task count to 0
+     */
+    TaskSet.prototype.clearCompletedTasks = function () {
+        this.tasksCompleted = [];
+        this.tasksCompletedCount = 0;
+    };
+    /** This is the total number of tasks completed regardless of the max tasks completed limit
+     */
+    TaskSet.prototype.getCompletedTaskCount = function () {
+        return this.tasksCompletedCount;
     };
     /** Check whether a specific task or, if no name is provided, if any tasks, are currently in progress
      * @param [taskName] optional name of the task to check
@@ -81,14 +107,7 @@ var TaskSet = (function () {
         var that = this;
         function taskDone(res) {
             // keep a log of completed tasks
-            that.tasksComplete.push({
-                name: taskName,
-                task: newTask
-            });
-            // drop the older half of the task history array when full
-            if (that.tasksComplete.length > TaskSet.MAX_COMPLETED_TASKS_HISTORY) {
-                that.tasksComplete = that.tasksComplete.slice(that.tasksComplete.length / 2, that.tasksComplete.length);
-            }
+            that.saveCompletedTask(taskName, newTask);
             // remove the completed task
             that.tasksInProgress.delete(taskName);
             that.callTaskCompleted(taskName);
@@ -116,6 +135,22 @@ var TaskSet = (function () {
         this.tasksInProgress.set(taskName, newTask);
         this.callTaskStarted(taskName);
         return newTask;
+    };
+    TaskSet.prototype.saveCompletedTask = function (taskName, newTask) {
+        this.tasksCompletedCount++;
+        if (this.maxCompletedTasks !== 0) {
+            this.tasksCompleted.push({
+                name: taskName,
+                task: newTask
+            });
+            // drop the older half of the task history array when full
+            var taskCount = this.tasksCompleted.length;
+            if (this.maxCompletedTasks > -1 && taskCount > this.maxCompletedTasks) {
+                var mustDrop = taskCount - this.maxCompletedTasks;
+                var percentCount = Math.round(this.maxCompletedTasks * this.dropCompletedTasksPercentage);
+                this.tasksCompleted = this.tasksCompleted.slice(mustDrop + percentCount, taskCount);
+            }
+        }
     };
     TaskSet.prototype.callTaskStarted = function (taskName) {
         if (this.taskStartedCallback) {
@@ -150,7 +185,6 @@ var TaskSet = (function () {
             throw new Error(msg + " callback argument must be a function");
         }
     };
-    TaskSet.MAX_COMPLETED_TASKS_HISTORY = 200;
     return TaskSet;
 }());
 module.exports = TaskSet;
