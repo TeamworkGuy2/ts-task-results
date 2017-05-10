@@ -2,8 +2,8 @@
 var Q = require("q");
 var TaskStatus = require("./TaskStatus");
 /** Task class for a synchronous or asynchronous task
- * @param <R> the type of data returned by this task if it succeeds
- * @param <S> the type of error throw by this task if it fails
+ * @template R the type of data returned by this task if it succeeds
+ * @template S the type of error throw by this task if it fails
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
@@ -75,7 +75,7 @@ var Task = (function () {
     Task.prototype.getError = function () {
         return this.error;
     };
-    Task.isPromise = Q.isPromiseAlike;
     return Task;
 }());
+Task.isPromise = Q.isPromiseAlike;
 module.exports = Task;

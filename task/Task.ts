@@ -2,8 +2,8 @@
 import TaskStatus = require("./TaskStatus");
 
 /** Task class for a synchronous or asynchronous task
- * @param <R> the type of data returned by this task if it succeeds
- * @param <S> the type of error throw by this task if it fails
+ * @template R the type of data returned by this task if it succeeds
+ * @template S the type of error throw by this task if it fails
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
@@ -100,7 +100,7 @@ class Task<R, S> {
 
 module Task {
 
-    /** Extension of {@link Q.Promise} that has an error type
+    /** Extension of Q.Promise that has an error type
      * @since 2015-3-16
      */
     export interface Promise<T, R> extends Q.Promise<T> {
@@ -108,7 +108,7 @@ module Task {
     }
 
 
-    /** Extension of {@link Q.Deferred} that has an error type
+    /** Extension of Q.Deferred that has an error type
      * @since 2015-3-16
      */
     export interface Deferred<T, R> extends Q.Deferred<T> {

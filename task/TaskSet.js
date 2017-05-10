@@ -1,11 +1,11 @@
-/// <reference path="../../ts-promises/ts-promises.d.ts" />
 "use strict";
+/// <reference path="../../ts-promises/ts-promises.d.ts" />
 var Task = require("./Task");
 /** A set of tasks where all tasks return the same result type.
  * The advantage of a TaskSet over a Promise[] is that a task set provides listeners for start, completion, and failure events to be intercepted for logging or other purposes
  * @since 2016-09-24
- * @param <T> the type of result returned by the tasks in this task set
- * @param <S> the type of error throw by the tasks in this task set
+ * @template T the type of result returned by the tasks in this task set
+ * @template S the type of error throw by the tasks in this task set
  */
 var TaskSet = (function () {
     /** Create an empty task set with option started, completed, and failed callbacks
@@ -14,7 +14,7 @@ var TaskSet = (function () {
      * @param [taskFailedCb] a function to call when a task fails
      */
     function TaskSet(taskStartedCb, taskCompletedCb, taskFailedCb) {
-        /** The maximum number of completed tasks which can be saved by this task set and retrieved via {@code getCompletedTasks()}.
+        /** The maximum number of completed tasks which can be saved by this task set and retrieved via getCompletedTasks().
          * If this value is 0, then no task history is kept.
          * If this value is -1, then all task history is kept
          */
@@ -158,6 +158,7 @@ var TaskSet = (function () {
                 this.taskStartedCallback(taskName);
             }
             catch (e) {
+                // Do nothing
             }
         }
     };
@@ -167,6 +168,7 @@ var TaskSet = (function () {
                 this.taskCompletedCallback(taskName);
             }
             catch (e) {
+                // Do nothing
             }
         }
     };
@@ -176,6 +178,7 @@ var TaskSet = (function () {
                 this.taskFailedCallback(taskName);
             }
             catch (e) {
+                // Do nothing
             }
         }
     };

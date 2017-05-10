@@ -1,6 +1,5 @@
-/// <reference path="../../definitions/chai/chai.d.ts" />
-/// <reference path="../../definitions/mocha/mocha.d.ts" />
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var Q = require("q");
 var TaskSet = require("../task/TaskSet");

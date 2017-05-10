@@ -1,8 +1,8 @@
-﻿/// <reference path="../../definitions/q/Q.d.ts" />
+﻿/// <reference types="q" />
 
 /**
- * @param <R> the result type
- * @param <E> the error type
+ * @template R the result type
+ * @template E the error type
  */
 interface ResultOrError<R, E> {
     hasResult: boolean;
@@ -12,8 +12,8 @@ interface ResultOrError<R, E> {
 
 
 /**
- * @param <R> the result array element type
- * @param <E> the error array element type
+ * @template R the result array element type
+ * @template E the error array element type
  */
 interface ResultsAndErrors<R, E> {
     results: R[];

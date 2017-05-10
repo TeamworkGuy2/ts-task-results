@@ -1,6 +1,6 @@
 ﻿import EnumCreator = require("../../ts-mortar/utils/EnumCreator");
 
-/** TaskStatus enum for the status of a {@link Task}
+/** TaskStatus enum for the status of a Task
  * @author TeamworkGuy2
  * @since 2016-5-24
  */

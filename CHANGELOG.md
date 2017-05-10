@@ -4,7 +4,14 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.5](N/A) - 2016-09-27
+### [0.1.6](N/A) - 2017-05-09
+#### Changed
+* Update to TypeScript 2.3, add tsconfig.json, use @types/ definitions
+* Update documentation to work better with Visual Studio
+
+
+--------
+### [0.1.5](https://github.com/TeamworkGuy2/ts-task-results/commit/fbcf39949f39fe6ca8f11fb453a8d49440cab2c2) - 2016-09-27
 #### Added
 * TaskSet support for accessing the list of completed tasks and controlling the size and clearing behavior of the list of completed tasks
   * new maxCompletedTasks and dropCompletedTasksPercentage public properties (these are public, but may be moved to getters/setters or get renamed in future)
