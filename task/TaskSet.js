@@ -1,5 +1,5 @@
 "use strict";
-/// <reference path="../../ts-promises/ts-promises.d.ts" />
+var Defer = require("../../ts-promises/Defer");
 var Task = require("./Task");
 /** A set of tasks where all tasks return the same result type.
  * The advantage of a TaskSet over a Promise[] is that a task set provides listeners for start, completion, and failure events to be intercepted for logging or other purposes
@@ -50,7 +50,7 @@ var TaskSet = (function () {
         TaskSet.checkCallback(cb, "task failed");
         this.taskFailedCallback = cb;
     };
-    /** @return a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
+    /** @returns a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
      * @ee #getMaxTasksCompletedSize()
      */
     TaskSet.prototype.getCompletedTasks = function () {
@@ -72,7 +72,7 @@ var TaskSet = (function () {
      */
     TaskSet.prototype.isRunning = function (taskName) {
         if (taskName != null) {
-            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).status.isRunning() : false;
+            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).state.isRunning() : false;
         }
         else {
             return this.tasksInProgress.size > 0;
@@ -117,7 +117,7 @@ var TaskSet = (function () {
             // remove failed task
             that.tasksInProgress.delete(taskName);
             that.callTaskFailed(taskName);
-            throw err;
+            return Defer.throwBack(err);
         }
         // handle promises or functions
         var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : function taskWrapper() {
@@ -130,7 +130,7 @@ var TaskSet = (function () {
             }
         };
         // create and start the task
-        var newTask = new Task(taskName, taskWrapped);
+        var newTask = Task.newTask(taskName, taskWrapped);
         newTask.start();
         this.tasksInProgress.set(taskName, newTask);
         this.callTaskStarted(taskName);

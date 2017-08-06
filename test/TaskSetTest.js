@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var Q = require("q");
 var TaskSet = require("../task/TaskSet");
-var TaskStatus = require("../task/TaskStatus");
+var TaskState = require("../task/TaskState");
 var asr = chai.assert;
 suite("TaskSet", function TaskSetTest() {
     function createTaskRes1(res) {
@@ -38,9 +38,9 @@ suite("TaskSet", function TaskSetTest() {
         Q.all(taskSet.getPromises()).done(function (res) {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
             asr.equal(task1.getResult(), "success-1");
-            asr.equal(task1.status, TaskStatus.COMPLETED);
+            asr.equal(task1.state, TaskState.COMPLETED);
             asr.equal(task2.getResult(), "success-2");
-            asr.equal(task2.status, TaskStatus.COMPLETED);
+            asr.equal(task2.state, TaskState.COMPLETED);
             done();
         }, function (err) {
             asr.equal(true, false, "unexpected error");

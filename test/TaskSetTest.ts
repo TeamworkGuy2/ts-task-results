@@ -1,9 +1,8 @@
 ﻿import chai = require("chai");
 import mocha = require("mocha");
 import Q = require("q");
-import Task = require("../task/Task");
 import TaskSet = require("../task/TaskSet");
-import TaskStatus = require("../task/TaskStatus");
+import TaskState = require("../task/TaskState");
 
 
 var asr = chai.assert;
@@ -52,10 +51,10 @@ suite("TaskSet", function TaskSetTest() {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
 
             asr.equal(task1.getResult(), "success-1");
-            asr.equal(task1.status, TaskStatus.COMPLETED);
+            asr.equal(task1.state, TaskState.COMPLETED);
 
             asr.equal(task2.getResult(), "success-2");
-            asr.equal(task2.status, TaskStatus.COMPLETED);
+            asr.equal(task2.state, TaskState.COMPLETED);
             done();
         }, function (err) {
             asr.equal(true, false, "unexpected error");

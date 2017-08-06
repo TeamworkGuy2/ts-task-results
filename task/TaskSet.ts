@@ -1,6 +1,4 @@
-﻿/// <reference path="../../ts-promises/ts-promises.d.ts" />
-
-import Defer = require("../../ts-promises/Defer");
+﻿import Defer = require("../../ts-promises/Defer");
 import Task = require("./Task");
 
 /** A set of tasks where all tasks return the same result type.
@@ -19,8 +17,8 @@ class TaskSet<T, S> {
      */
     public dropCompletedTasksPercentage: number = 0.5;
 
-    private tasksInProgress: Map<string, Task<T, S>>;
-    private tasksCompleted: { name: string; task: Task<T, S> }[];
+    private tasksInProgress: Map<string, TaskResults.Task<T, S>>;
+    private tasksCompleted: { name: string; task: TaskResults.Task<T, S> }[];
     private tasksCompletedCount: number = 0;
     private taskStartedCallback: (taskName: string) => void;
     private taskCompletedCallback: (taskName: string) => void;
@@ -33,7 +31,7 @@ class TaskSet<T, S> {
      * @param [taskFailedCb] a function to call when a task fails
      */
     constructor(taskStartedCb?: (taskName: string) => void, taskCompletedCb?: (taskName: string) => void, taskFailedCb?: (taskName: string) => void) {
-        this.tasksInProgress = new Map<string, Task<T, S>>();
+        this.tasksInProgress = new Map<string, TaskResults.Task<T, S>>();
         this.tasksCompleted = [];
         this.taskStartedCallback = taskStartedCb;
         this.taskCompletedCallback = taskCompletedCb;
@@ -74,10 +72,10 @@ class TaskSet<T, S> {
     }
 
 
-    /** @return a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
+    /** @returns a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
      * @ee #getMaxTasksCompletedSize()
      */
-    public getCompletedTasks(): { name: string; task: Task<T, S> }[] {
+    public getCompletedTasks(): { name: string; task: TaskResults.Task<T, S> }[] {
         return this.tasksCompleted;
     }
 
@@ -102,7 +100,7 @@ class TaskSet<T, S> {
      */
     public isRunning(taskName?: string): boolean {
         if (taskName != null) {
-            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).status.isRunning() : false;
+            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).state.isRunning() : false;
         }
         else {
             return this.tasksInProgress.size > 0;
@@ -112,8 +110,8 @@ class TaskSet<T, S> {
 
     /** All of the currently in progress tasks flattened into an array of objects with 'name' and 'task' properties
      */
-    public getInProgressTasks(): { name: string; task: Task<T, S> }[] {
-        var res: { name: string; task: Task<T, S> }[] = [];
+    public getInProgressTasks(): { name: string; task: TaskResults.Task<T, S> }[] {
+        var res: { name: string; task: TaskResults.Task<T, S> }[] = [];
         this.tasksInProgress.forEach((task, name) => {
             res.push({ name, task });
         });
@@ -123,7 +121,7 @@ class TaskSet<T, S> {
 
     /** All of the currently in-progress tasks
      */
-    public getTasks(): Map<string, Task<T, S>> {
+    public getTasks(): Map<string, TaskResults.Task<T, S>> {
         return this.tasksInProgress;
     }
 
@@ -141,10 +139,10 @@ class TaskSet<T, S> {
      * @param taskName the name of the task
      * @param taskPromise the promise which the new task will be based on, when this promise completes/fails, the task will complete/fail
      */
-    public startTask(taskName: string, task: (() => T) | PsPromise<T, S>): Task<T, S> {
+    public startTask(taskName: string, task: (() => T) | PsPromise<T, S>): TaskResults.Task<T, S> {
         var that = this;
 
-        function taskDone<E1>(res: E1): E1 {
+        function taskDone<R1>(res: R1): R1 {
             // keep a log of completed tasks
             that.saveCompletedTask(taskName, newTask);
 
@@ -155,12 +153,12 @@ class TaskSet<T, S> {
             return res;
         }
 
-        function taskError<E1>(err: E1): E1 {
+        function taskError<E1>(err: E1): Throws<E1> {
             // remove failed task
             that.tasksInProgress.delete(taskName);
             that.callTaskFailed(taskName);
 
-            throw err;
+            return Defer.throwBack(err);
         }
 
         // handle promises or functions
@@ -174,7 +172,7 @@ class TaskSet<T, S> {
         };
 
         // create and start the task
-        var newTask = new Task<T, S>(taskName, taskWrapped);
+        var newTask = Task.newTask<T, S>(taskName, taskWrapped);
 
         newTask.start();
 
@@ -185,7 +183,7 @@ class TaskSet<T, S> {
     }
 
 
-    private saveCompletedTask(taskName: string, newTask: Task<T, S>) {
+    private saveCompletedTask(taskName: string, newTask: TaskResults.Task<T, S>) {
         this.tasksCompletedCount++;
 
         if (this.maxCompletedTasks !== 0) {

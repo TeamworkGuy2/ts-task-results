@@ -1,7 +1,7 @@
 "use strict";
 var Q = require("q");
-var TaskStatus = require("./TaskStatus");
-/** Task class for a synchronous or asynchronous task
+var TaskState = require("./TaskState");
+/** Task implementation for a synchronous or asynchronous task
  * @template R the type of data returned by this task if it succeeds
  * @template S the type of error throw by this task if it fails
  * @author TeamworkGuy2
@@ -10,50 +10,37 @@ var TaskStatus = require("./TaskStatus");
 var Task = (function () {
     function Task(name, action, dfd) {
         if (dfd === void 0) { dfd = Q.defer(); }
-        this._name = name;
+        this.name = name;
+        this.state = TaskState.CREATED;
         this.action = action;
         this.actionDfd = dfd;
         this.isPromise = Task.isPromise(action);
-        this._status = TaskStatus.CREATED;
-        this.start = this.start.bind(this);
+        this.result = undefined;
+        this.error = undefined;
     }
-    Object.defineProperty(Task.prototype, "status", {
-        get: function () {
-            return this._status;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Task.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Task.prototype.start = function () {
         var that = this;
-        if (this._status !== TaskStatus.CREATED) {
+        if (this.state !== TaskState.CREATED) {
             throw new Error("task has already been started, cannot start task more than once");
         }
         function taskCompleted(res) {
-            that._status = TaskStatus.COMPLETED;
+            that.state = TaskState.COMPLETED;
             that.result = res;
             that.actionDfd.resolve(res);
         }
         function taskErrored(err) {
-            that._status = TaskStatus.ERRORED;
+            that.state = TaskState.ERRORED;
             that.error = err;
             that.actionDfd.reject(err);
         }
-        this._status = TaskStatus.AWAITING_EXECUTION;
+        this.state = TaskState.AWAITING_EXECUTION;
         if (this.isPromise) {
-            this._status = TaskStatus.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
+            this.state = TaskState.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
             this.action.then(taskCompleted, taskErrored);
         }
         else {
             try {
-                this._status = TaskStatus.RUNNING;
+                this.state = TaskState.RUNNING;
                 var res = this.action();
                 taskCompleted(res);
             }
@@ -64,7 +51,7 @@ var Task = (function () {
         return this.actionDfd.promise;
     };
     Task.prototype.isSettled = function () {
-        return this._status.isSettled();
+        return this.state.isSettled();
     };
     Task.prototype.getPromise = function () {
         return this.actionDfd.promise;
@@ -75,7 +62,16 @@ var Task = (function () {
     Task.prototype.getError = function () {
         return this.error;
     };
+    /** Create a task
+     * @param name the name of the task
+     * @param action the unit of work performed by this task, a function or promise
+     * @param [dfd] an optional Deferred to use for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
+     */
+    Task.newTask = function (name, action, dfd) {
+        if (dfd === void 0) { dfd = Q.defer(); }
+        return new Task(name, action, dfd);
+    };
+    Task.isPromise = Q.isPromiseAlike;
     return Task;
 }());
-Task.isPromise = Q.isPromiseAlike;
 module.exports = Task;

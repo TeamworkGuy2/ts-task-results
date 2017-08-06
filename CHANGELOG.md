@@ -4,7 +4,25 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.1.6](N/A) - 2017-05-09
+### [0.2.0](N/A) - 2017-08-06
+#### Changed
+* `Results.resultOrError()` now determines `hasResult` based on whether error is null or not, not whether result is not null as previously
+* Renamed `TaskStatus` -> `TaskState`
+* Rename `Task.status` -> `Task.state`
+* `Task` now `implements TaskResults.Task` interface
+* `TaskState` implements `TaskResults.TaskState` interface
+* Renamed `Task` `_status` -> `state` and `_name` -> `name` and removed `status` and `name` getters infavor of readonly properties behind TaskResults.Task interface, callers should no longer import Task directly, instead use the new Task.newTask() method
+* Full TypeScript 2.4 support
+
+
+--------
+### [0.1.7](N/A) - 2017-08-05
+#### Changed
+* Update to TypeScript 2.4
+
+
+--------
+### [0.1.6](https://github.com/TeamworkGuy2/ts-task-results/commit/e45e1ebad2a012a385199ff06d216864930980a6) - 2017-05-09
 #### Changed
 * Update to TypeScript 2.3, add tsconfig.json, use @types/ definitions
 * Update documentation to work better with Visual Studio
@@ -21,10 +39,10 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 --------
 ### [0.1.4](https://github.com/TeamworkGuy2/ts-task-results/commit/277d8f51441b3ceec8bb0d592efffb7bf9f8e109) - 2016-09-24
 #### Added
-* Added TaskSet for creating and handling lists of Tasks
+* Added `TaskSet` for creating and handling lists of Tasks
 
 #### Removed
- * Task.newInst() - use 'new Task()'
+ * `Task.newInst()` - use `new Task()`
 
 
 --------
@@ -48,4 +66,4 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 --------
 ### [0.1.0](https://github.com/TeamworkGuy2/ts-task-results/commit/46cb886b4855c665226347d0a1f3251f0f040fdc) - 2016-05-24
 #### Added
-Initial commit of Task, TaskStatus, and Results
+Initial commit of `Task`, `TaskStatus`, and `Results`

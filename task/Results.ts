@@ -27,7 +27,7 @@ module Results {
         //    throw new Error("cannot create a result with both a non-null value and non-null error");
         //}
         return {
-            hasResult: value != null,
+            hasResult: error == null,
             result: value,
             error: error
         };

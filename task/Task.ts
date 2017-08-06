@@ -1,71 +1,63 @@
 ﻿import Q = require("q");
-import TaskStatus = require("./TaskStatus");
+import TaskState = require("./TaskState");
 
-/** Task class for a synchronous or asynchronous task
+/** Task implementation for a synchronous or asynchronous task
  * @template R the type of data returned by this task if it succeeds
  * @template S the type of error throw by this task if it fails
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
-class Task<R, S> {
+class Task<R, S> implements TaskResults.Task<R, S> {
     public static isPromise: (obj: any) => obj is Q.IPromise<any> = <any>Q.isPromiseAlike;
 
     private action: (() => R) | Q.IPromise<R>;
     private isPromise: boolean;
     private actionDfd: Task.Deferred<R, S>;
-    private _name: string;
-    private _status: TaskStatus;
     private result: R;
     private error: S;
 
+    public name: string;
+    public state: TaskState;
 
-    constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> = Q.defer<R>()) {
-        this._name = name;
+
+    private constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> = Q.defer<R>()) {
+        this.name = name;
+        this.state = TaskState.CREATED;
         this.action = action;
         this.actionDfd = dfd;
         this.isPromise = Task.isPromise(action);
-        this._status = TaskStatus.CREATED;
-
-        this.start = this.start.bind(this);
-    }
-
-
-    get status(): TaskStatus {
-        return this._status;
-    }
-
-    get name(): string {
-        return this._name;
+        this.result = undefined;
+        this.error = undefined;
     }
 
 
     public start(): Q.IPromise<R> {
         var that = this;
-        if (this._status !== TaskStatus.CREATED) {
+        if (this.state !== TaskState.CREATED) {
             throw new Error("task has already been started, cannot start task more than once");
         }
 
         function taskCompleted(res: R) {
-            that._status = TaskStatus.COMPLETED;
+            that.state = TaskState.COMPLETED;
             that.result = res;
             that.actionDfd.resolve(res);
         }
 
         function taskErrored(err) {
-            that._status = TaskStatus.ERRORED;
+            that.state = TaskState.ERRORED;
             that.error = err;
             that.actionDfd.reject(err);
         }
 
-        this._status = TaskStatus.AWAITING_EXECUTION;
+        this.state = TaskState.AWAITING_EXECUTION;
 
         if (this.isPromise) {
-            this._status = TaskStatus.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
+            this.state = TaskState.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
             (<Q.IPromise<R>><any>this.action).then(taskCompleted, taskErrored);
         }
         else {
             try {
-                this._status = TaskStatus.RUNNING;
+                this.state = TaskState.RUNNING;
                 var res = (<() => R><any>this.action)();
                 taskCompleted(res);
             } catch (e) {
@@ -78,7 +70,7 @@ class Task<R, S> {
 
 
     public isSettled(): boolean {
-        return this._status.isSettled();
+        return this.state.isSettled();
     }
 
 
@@ -96,24 +88,14 @@ class Task<R, S> {
         return this.error;
     }
 
-}
 
-module Task {
-
-    /** Extension of Q.Promise that has an error type
-     * @since 2015-3-16
+    /** Create a task
+     * @param name the name of the task
+     * @param action the unit of work performed by this task, a function or promise 
+     * @param [dfd] an optional Deferred to use for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
      */
-    export interface Promise<T, R> extends Q.Promise<T> {
-        then<U>(onFulfill?: (value: T) => U | Q.IPromise<U>, onReject?: (error: R) => U | Q.IPromise<U>, onProgress?: Function): Q.Promise<U>;
-    }
-
-
-    /** Extension of Q.Deferred that has an error type
-     * @since 2015-3-16
-     */
-    export interface Deferred<T, R> extends Q.Deferred<T> {
-        promise: Task.Promise<T, R>;
-        reject(reason: R): void;
+    public static newTask<R1, S1>(name: string, action: (() => R1) | Q.IPromise<R1>, dfd: Q.Deferred<R1> = Q.defer<R1>()): TaskResults.Task<R1, S1> {
+        return new Task<R1, S1>(name, action, dfd);
     }
 
 }
