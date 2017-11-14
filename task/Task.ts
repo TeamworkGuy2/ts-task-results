@@ -12,15 +12,15 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
     private action: (() => R) | Q.IPromise<R>;
     private isPromise: boolean;
-    private actionDfd: Task.Deferred<R, S>;
-    private result: R;
-    private error: S;
+    private actionDfd: PsDeferred<R, S>;
+    private result: R | null | undefined;
+    private error: S | null | undefined;
 
     public name: string;
     public state: TaskState;
 
 
-    private constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> = Q.defer<R>()) {
+    constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> = Q.defer<R>()) {
         this.name = name;
         this.state = TaskState.CREATED;
         this.action = action;
@@ -39,13 +39,13 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
         function taskCompleted(res: R) {
             that.state = TaskState.COMPLETED;
-            that.result = res;
+            that.result = res != null ? res : null;
             that.actionDfd.resolve(res);
         }
 
-        function taskErrored(err) {
+        function taskErrored(err: any) {
             that.state = TaskState.ERRORED;
-            that.error = err;
+            that.error = err != null ? err : null;
             that.actionDfd.reject(err);
         }
 
@@ -74,28 +74,18 @@ class Task<R, S> implements TaskResults.Task<R, S> {
     }
 
 
-    public getPromise(): Task.Promise<R, S> {
+    public getPromise(): PsPromise<R, S> {
         return this.actionDfd.promise;
     }
 
 
-    public getResult(): R {
+    public getResult(): R | null | undefined {
         return this.result;
     }
 
 
-    public getError(): S {
+    public getError(): S | null | undefined {
         return this.error;
-    }
-
-
-    /** Create a task
-     * @param name the name of the task
-     * @param action the unit of work performed by this task, a function or promise 
-     * @param [dfd] an optional Deferred to use for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
-     */
-    public static newTask<R1, S1>(name: string, action: (() => R1) | Q.IPromise<R1>, dfd: Q.Deferred<R1> = Q.defer<R1>()): TaskResults.Task<R1, S1> {
-        return new Task<R1, S1>(name, action, dfd);
     }
 
 }

@@ -1,14 +1,14 @@
 ﻿{
   "compileOnSave": true,
   "compilerOptions": {
-    "jsx": "preserve",
     "lib": [ "es2017" ],
     "module": "commonjs",
     "noEmitOnError": true,
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "removeComments": false,
     "sourceMap": false,
+    "strictNullChecks": true,
     "target": "es5"
   }
 }

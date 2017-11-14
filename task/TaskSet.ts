@@ -7,22 +7,21 @@ import Task = require("./Task");
  * @template T the type of result returned by the tasks in this task set
  * @template S the type of error throw by the tasks in this task set
  */
-class TaskSet<T, S> {
+class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
     /** The maximum number of completed tasks which can be saved by this task set and retrieved via getCompletedTasks().
      * If this value is 0, then no task history is kept.
      * If this value is -1, then all task history is kept
      */
     public maxCompletedTasks: number = 200;
-    /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it becomes full. Must be between [0, 1]
-     */
+    /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it's full. Must be between [0, 1] */
     public dropCompletedTasksPercentage: number = 0.5;
 
     private tasksInProgress: Map<string, TaskResults.Task<T, S>>;
     private tasksCompleted: { name: string; task: TaskResults.Task<T, S> }[];
     private tasksCompletedCount: number = 0;
-    private taskStartedCallback: (taskName: string) => void;
-    private taskCompletedCallback: (taskName: string) => void;
-    private taskFailedCallback: (taskName: string) => void;
+    private taskStartedCallback: ((taskName: string) => void) | undefined;
+    private taskCompletedCallback: ((taskName: string) => void) | undefined;
+    private taskFailedCallback: ((taskName: string) => void) | undefined;
 
 
     /** Create an empty task set with option started, completed, and failed callbacks
@@ -39,7 +38,7 @@ class TaskSet<T, S> {
     }
 
 
-    public getTaskStartedCallback(): (taskName: string) => void {
+    public getTaskStartedCallback(): ((taskName: string) => void) | undefined {
         return this.taskStartedCallback;
     }
 
@@ -50,7 +49,7 @@ class TaskSet<T, S> {
     }
 
 
-    public getTaskCompletedCallback(): (taskName: string) => void {
+    public getTaskCompletedCallback(): ((taskName: string) => void) | undefined {
         return this.taskCompletedCallback;
     }
 
@@ -61,7 +60,7 @@ class TaskSet<T, S> {
     }
 
 
-    public getTaskFailedCallback(): (taskName: string) => void {
+    public getTaskFailedCallback(): ((taskName: string) => void) | undefined {
         return this.taskFailedCallback;
     }
 
@@ -73,7 +72,7 @@ class TaskSet<T, S> {
 
 
     /** @returns a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
-     * @ee #getMaxTasksCompletedSize()
+     * @see #getMaxTasksCompletedSize()
      */
     public getCompletedTasks(): { name: string; task: TaskResults.Task<T, S> }[] {
         return this.tasksCompleted;
@@ -100,7 +99,8 @@ class TaskSet<T, S> {
      */
     public isRunning(taskName?: string): boolean {
         if (taskName != null) {
-            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).state.isRunning() : false;
+            var task = this.tasksInProgress.get(taskName);
+            return task != null ? task.state.isRunning() : false;
         }
         else {
             return this.tasksInProgress.size > 0;
@@ -129,7 +129,7 @@ class TaskSet<T, S> {
     /** Return an array of promises from all of the currently in-progress tasks
      */
     public getPromises(): PsPromise<T, S>[] {
-        var promises: Task.Promise<T, S>[] = [];
+        var promises: PsPromise<T, S>[] = [];
         this.tasksInProgress.forEach((task) => promises.push(task.getPromise()));
         return promises;
     }
@@ -162,7 +162,7 @@ class TaskSet<T, S> {
         }
 
         // handle promises or functions
-        var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : function taskWrapper() {
+        var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : <() => T>function taskWrapper() {
             try {
                 var res = task();
                 return taskDone(res);
@@ -172,7 +172,7 @@ class TaskSet<T, S> {
         };
 
         // create and start the task
-        var newTask = Task.newTask<T, S>(taskName, taskWrapped);
+        var newTask = new Task<T, S>(taskName, taskWrapped);
 
         newTask.start();
 

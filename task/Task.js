@@ -25,12 +25,12 @@ var Task = (function () {
         }
         function taskCompleted(res) {
             that.state = TaskState.COMPLETED;
-            that.result = res;
+            that.result = res != null ? res : null;
             that.actionDfd.resolve(res);
         }
         function taskErrored(err) {
             that.state = TaskState.ERRORED;
-            that.error = err;
+            that.error = err != null ? err : null;
             that.actionDfd.reject(err);
         }
         this.state = TaskState.AWAITING_EXECUTION;
@@ -61,15 +61,6 @@ var Task = (function () {
     };
     Task.prototype.getError = function () {
         return this.error;
-    };
-    /** Create a task
-     * @param name the name of the task
-     * @param action the unit of work performed by this task, a function or promise
-     * @param [dfd] an optional Deferred to use for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
-     */
-    Task.newTask = function (name, action, dfd) {
-        if (dfd === void 0) { dfd = Q.defer(); }
-        return new Task(name, action, dfd);
     };
     Task.isPromise = Q.isPromiseAlike;
     return Task;

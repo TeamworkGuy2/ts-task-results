@@ -1,6 +1,6 @@
 ﻿import chai = require("chai");
 import mocha = require("mocha");
-import Task = require("../task/Task");
+import Tasks = require("../task/Tasks");
 import TaskState = require("../task/TaskState");
 
 
@@ -11,7 +11,7 @@ suite("Task", function TaskTest() {
 
     test("task-success", function taskSuccessTest(done) {
         // test success
-        var res1 = Task.newTask("a", () => "a-success");
+        var res1 = Tasks.newTask("a", () => "a-success");
 
         asr.equal(res1.name, "a");
         asr.equal(res1.state, TaskState.CREATED);
@@ -32,7 +32,7 @@ suite("Task", function TaskTest() {
 
     test("task-failure", function taskFailureTest(done) {
         // test failure
-        var res1 = Task.newTask("a", () => { throw "a-error"; });
+        var res1 = Tasks.newTask("a", () => { throw "a-error"; });
 
         asr.equal(res1.name, "a");
         asr.equal(res1.state, TaskState.CREATED);

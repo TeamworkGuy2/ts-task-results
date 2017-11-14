@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
-var Task = require("../task/Task");
+var Tasks = require("../task/Tasks");
 var TaskState = require("../task/TaskState");
 var asr = chai.assert;
 suite("Task", function TaskTest() {
     test("task-success", function taskSuccessTest(done) {
         // test success
-        var res1 = Task.newTask("a", function () { return "a-success"; });
+        var res1 = Tasks.newTask("a", function () { return "a-success"; });
         asr.equal(res1.name, "a");
         asr.equal(res1.state, TaskState.CREATED);
         res1.getPromise().then(function (res) {
@@ -23,7 +23,7 @@ suite("Task", function TaskTest() {
     });
     test("task-failure", function taskFailureTest(done) {
         // test failure
-        var res1 = Task.newTask("a", function () { throw "a-error"; });
+        var res1 = Tasks.newTask("a", function () { throw "a-error"; });
         asr.equal(res1.name, "a");
         asr.equal(res1.state, TaskState.CREATED);
         res1.getPromise().then(function (res) {

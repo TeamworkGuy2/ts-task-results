@@ -19,8 +19,7 @@ var TaskSet = (function () {
          * If this value is -1, then all task history is kept
          */
         this.maxCompletedTasks = 200;
-        /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it becomes full. Must be between [0, 1]
-         */
+        /** The percentage of 'maxCompletedTasks' to drop from the 'tasksCompleted' array when it's full. Must be between [0, 1] */
         this.dropCompletedTasksPercentage = 0.5;
         this.tasksCompletedCount = 0;
         this.tasksInProgress = new Map();
@@ -51,7 +50,7 @@ var TaskSet = (function () {
         this.taskFailedCallback = cb;
     };
     /** @returns a list of completed tasks, possibly only containing a limited number of the most recently completed tasks based on the max tasks completed limit.
-     * @ee #getMaxTasksCompletedSize()
+     * @see #getMaxTasksCompletedSize()
      */
     TaskSet.prototype.getCompletedTasks = function () {
         return this.tasksCompleted;
@@ -72,7 +71,8 @@ var TaskSet = (function () {
      */
     TaskSet.prototype.isRunning = function (taskName) {
         if (taskName != null) {
-            return this.tasksInProgress.get(taskName) != null ? this.tasksInProgress.get(taskName).state.isRunning() : false;
+            var task = this.tasksInProgress.get(taskName);
+            return task != null ? task.state.isRunning() : false;
         }
         else {
             return this.tasksInProgress.size > 0;
@@ -130,7 +130,7 @@ var TaskSet = (function () {
             }
         };
         // create and start the task
-        var newTask = Task.newTask(taskName, taskWrapped);
+        var newTask = new Task(taskName, taskWrapped);
         newTask.start();
         this.tasksInProgress.set(taskName, newTask);
         this.callTaskStarted(taskName);

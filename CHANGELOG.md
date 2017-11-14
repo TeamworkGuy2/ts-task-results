@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.2.0](N/A) - 2017-08-06
+### [0.3.0](N/A) - 2017-11-14
+#### Changed
+* `package.json` added `strictNullChecks` and enabled `noImplicitThis` and fixed code to work with these flags
+* Added/improved `Task and `TaskSet` interfaces to match their implementations
+* Changed Task constructor() from private to public
+
+
+--------
+### [0.2.0](https://github.com/TeamworkGuy2/ts-task-results/commit/c52c8840d7f91e9d00261384e213c368a0cf70e0) - 2017-08-06
 #### Changed
 * `Results.resultOrError()` now determines `hasResult` based on whether error is null or not, not whether result is not null as previously
 * Renamed `TaskStatus` -> `TaskState`
@@ -12,13 +20,7 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 * `Task` now `implements TaskResults.Task` interface
 * `TaskState` implements `TaskResults.TaskState` interface
 * Renamed `Task` `_status` -> `state` and `_name` -> `name` and removed `status` and `name` getters infavor of readonly properties behind TaskResults.Task interface, callers should no longer import Task directly, instead use the new Task.newTask() method
-* Full TypeScript 2.4 support
-
-
---------
-### [0.1.7](N/A) - 2017-08-05
-#### Changed
-* Update to TypeScript 2.4
+* Update to TypeScript 2.4 support
 
 
 --------
