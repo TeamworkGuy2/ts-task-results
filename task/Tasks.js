@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="./task-results.d.ts" />
 var Q = require("q");
 var Task = require("./Task");
 var TaskSet = require("./TaskSet");

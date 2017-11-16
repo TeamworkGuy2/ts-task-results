@@ -1,4 +1,5 @@
-﻿import Q = require("q");
+﻿/// <reference path="./task-results.d.ts" />
+import Q = require("q");
 import Task = require("./Task");
 import TaskSet = require("./TaskSet");
 

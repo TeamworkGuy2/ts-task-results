@@ -93,6 +93,9 @@ interface TaskSet<T, S> {
     /** Clear the completed tasks array and reset the completed task count to 0 */
     clearCompletedTasks(): void;
 
+    /** This is the total number of tasks completed regardless of the max tasks completed limit */
+    getCompletedTaskCount(): number;
+
     /** Check whether a specific task or, if no name is provided, if any tasks, are currently in progress
      * @param [taskName] optional name of the task to check
      */

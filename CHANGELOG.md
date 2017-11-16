@@ -4,7 +4,14 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.0](N/A) - 2017-11-14
+### [0.3.1](N/A) - 2017-11-16
+#### Changed
+* Fix `TaskSet` interface, add missing `getCompletedTaskCount()`
+* Add `task-results.d.ts` reference to `Tasks.ts`
+
+
+--------
+### [0.3.0](https://github.com/TeamworkGuy2/ts-task-results/commit/0c2345d69f39e38225b71dfd13446a817a548807) - 2017-11-14
 #### Changed
 * `package.json` added `strictNullChecks` and enabled `noImplicitThis` and fixed code to work with these flags
 * Added/improved `Task and `TaskSet` interfaces to match their implementations
