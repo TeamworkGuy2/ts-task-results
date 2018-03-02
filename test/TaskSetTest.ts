@@ -97,7 +97,7 @@ suite("TaskSet", function TaskSetTest() {
             taskSet.dropCompletedTasksPercentage = 0.6;
             startTasks(taskSet, "task-res-", "success-", 6);
 
-            return Q.all(taskSet.getPromises());
+            return <Q.IPromise<string[]>>Q.all(taskSet.getPromises());
         }).done(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();

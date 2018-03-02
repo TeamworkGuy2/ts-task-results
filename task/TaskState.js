@@ -4,7 +4,7 @@ var EnumCreator = require("../../ts-mortar/utils/EnumCreator");
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
-var TaskState = (function () {
+var TaskState = /** @class */ (function () {
     function TaskState(phase) {
         this.phase = phase;
     }

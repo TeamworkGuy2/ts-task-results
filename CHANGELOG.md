@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.1](N/A) - 2017-11-16
+### [0.3.2](N/A) - 2018-03-01
+#### Changed
+* Update to TypeScript 2.7
+* Update dependencies: mocha, @types/chai, @types/mocha, @types/node, @types/q
+* Enable tsconfig.json `noImplicitAny`
+
+
+--------
+### [0.3.1](https://github.com/TeamworkGuy2/ts-task-results/commit/aabed012252a80678d72fb1c755b9b8cf81554c2) - 2017-11-16
 #### Changed
 * Fix `TaskSet` interface, add missing `getCompletedTaskCount()`
 * Add `task-results.d.ts` reference to `Tasks.ts`

@@ -7,7 +7,7 @@ var Task = require("./Task");
  * @template T the type of result returned by the tasks in this task set
  * @template S the type of error throw by the tasks in this task set
  */
-var TaskSet = (function () {
+var TaskSet = /** @class */ (function () {
     /** Create an empty task set with option started, completed, and failed callbacks
      * @param [taskStartedCb] a function to call when a task starts (i.e. when startTask() is called)
      * @param [taskCompletedCb] a function to call when a task completes

@@ -7,7 +7,7 @@ var TaskState = require("./TaskState");
  * @author TeamworkGuy2
  * @since 2016-5-24
  */
-var Task = (function () {
+var Task = /** @class */ (function () {
     function Task(name, action, dfd) {
         if (dfd === void 0) { dfd = Q.defer(); }
         this.name = name;
