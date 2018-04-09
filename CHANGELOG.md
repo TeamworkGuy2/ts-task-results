@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.2](N/A) - 2018-03-01
+### [0.3.3](https://github.com/TeamworkGuy2/ts-task-results/commit/6d5000d022636e38a8a378980be03d6bbd114d44) - 2018-04-09
+#### Changed
+* Update to TypeScript 2.8, fix issues related to ts-promises vs Q and TypeScript lib.d.ts promises.
+* Update tsconfig.json with `noImplicitReturns: true` and `forceConsistentCasingInFileNames: true`
+* Added release tarball and npm script `build-package` to package.json referencing external process to generate tarball
+
+
+--------
+### [0.3.2](https://github.com/TeamworkGuy2/ts-task-results/commit/2616143e120681a2463d821238f1fd53eb015743) - 2018-03-01
 #### Changed
 * Update to TypeScript 2.7
 * Update dependencies: mocha, @types/chai, @types/mocha, @types/node, @types/q

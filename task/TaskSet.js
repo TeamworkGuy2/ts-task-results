@@ -1,5 +1,4 @@
 "use strict";
-var Defer = require("../../ts-promises/Defer");
 var Task = require("./Task");
 /** A set of tasks where all tasks return the same result type.
  * The advantage of a TaskSet over a Promise[] is that a task set provides listeners for start, completion, and failure events to be intercepted for logging or other purposes
@@ -117,7 +116,7 @@ var TaskSet = /** @class */ (function () {
             // remove failed task
             that.tasksInProgress.delete(taskName);
             that.callTaskFailed(taskName);
-            return Defer.throwBack(err);
+            throw err;
         }
         // handle promises or functions
         var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : function taskWrapper() {
@@ -128,6 +127,7 @@ var TaskSet = /** @class */ (function () {
             catch (e) {
                 taskError(e);
             }
+            return undefined;
         };
         // create and start the task
         var newTask = new Task(taskName, taskWrapped);

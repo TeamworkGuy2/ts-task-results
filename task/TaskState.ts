@@ -1,4 +1,4 @@
-﻿import EnumCreator = require("../../ts-mortar/utils/EnumCreator");
+﻿import EnumCreator = require("ts-mortar/utils/EnumCreator");
 
 /** TaskState enum for the status of a Task
  * @author TeamworkGuy2
@@ -40,7 +40,7 @@ var TaskPhase = {
 };
 
 
-var TaskStateEnum = EnumCreator.initEnumClass(TaskState, TaskState, (toMember) => {
+var TaskStateEnum = EnumCreator.initEnumClass(TaskState, TaskState, (toMember: (member: TaskState) => TaskState & EnumCreator.EnumMember) => {
     return {
         CANCELED: toMember(new TaskState(TaskPhase.SETTLED)),
         CREATED: toMember(new TaskState(TaskPhase.CREATED)),

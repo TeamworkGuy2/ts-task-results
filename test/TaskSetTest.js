@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var Q = require("q");
+var Defer = require("ts-promises/Defer");
 var TaskSet = require("../task/TaskSet");
 var TaskState = require("../task/TaskState");
 var asr = chai.assert;
@@ -35,7 +36,7 @@ suite("TaskSet", function TaskSetTest() {
         var taskSet = new TaskSet();
         var task1 = taskSet.startTask("task-res-1", createTaskRes1("success-1"));
         var task2 = taskSet.startTask("task-res-2", createTaskRes2("success-2", 10));
-        Q.all(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).done(function (res) {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
             asr.equal(task1.getResult(), "success-1");
             asr.equal(task1.state, TaskState.COMPLETED);
@@ -54,7 +55,7 @@ suite("TaskSet", function TaskSetTest() {
         var task2 = taskSet.startTask("task-res-2", createTaskRes2("success-2", 10));
         var task3 = taskSet.startTask("task-err-1", createTaskErr1("error-1"));
         var task4 = taskSet.startTask("task-err-2", createTaskErr2("error-2", 10));
-        Q.all(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).done(function (res) {
             asr.equal(true, false, "unexpected success");
             done();
         }, function (err) {
@@ -68,7 +69,7 @@ suite("TaskSet", function TaskSetTest() {
         taskSet.maxCompletedTasks = 3;
         taskSet.dropCompletedTasksPercentage = 0.25;
         startTasks(taskSet, "task-res-", "success-", 4);
-        Q.all(taskSet.getPromises()).then(function (res) {
+        Defer.when(taskSet.getPromises()).then(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();
         }).then(function () {
@@ -76,7 +77,7 @@ suite("TaskSet", function TaskSetTest() {
             taskSet.maxCompletedTasks = 5;
             taskSet.dropCompletedTasksPercentage = 0.6;
             startTasks(taskSet, "task-res-", "success-", 6);
-            return Q.all(taskSet.getPromises());
+            return Defer.when(taskSet.getPromises());
         }).done(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();

@@ -1,4 +1,4 @@
-﻿import Defer = require("../../ts-promises/Defer");
+﻿import Defer = require("ts-promises/Defer");
 import Task = require("./Task");
 
 /** A set of tasks where all tasks return the same result type.
@@ -139,7 +139,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
      * @param taskName the name of the task
      * @param taskPromise the promise which the new task will be based on, when this promise completes/fails, the task will complete/fail
      */
-    public startTask(taskName: string, task: (() => T) | PsPromise<T, S>): TaskResults.Task<T, S> {
+    public startTask(taskName: string, task: (() => T) | Q.IPromise<T> | PsPromise<T, S>): TaskResults.Task<T, S> {
         var that = this;
 
         function taskDone<R1>(res: R1): R1 {
@@ -153,22 +153,23 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
             return res;
         }
 
-        function taskError<E1>(err: E1): Throws<E1> {
+        function taskError(err: any): never {
             // remove failed task
             that.tasksInProgress.delete(taskName);
             that.callTaskFailed(taskName);
 
-            return Defer.throwBack(err);
+            throw err;
         }
 
         // handle promises or functions
         var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : <() => T>function taskWrapper() {
             try {
-                var res = task();
+                var res = (<() => T>task)();
                 return taskDone(res);
             } catch (e) {
                 taskError(e);
             }
+            return undefined;
         };
 
         // create and start the task

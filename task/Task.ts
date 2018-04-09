@@ -8,7 +8,7 @@ import TaskState = require("./TaskState");
  * @since 2016-5-24
  */
 class Task<R, S> implements TaskResults.Task<R, S> {
-    public static isPromise: (obj: any) => obj is Q.IPromise<any> = <any>Q.isPromiseAlike;
+    public static isPromise: (obj: any) => obj is PromiseLike<any> = Q.isPromiseAlike;
 
     private action: (() => R) | Q.IPromise<R>;
     private isPromise: boolean;
@@ -20,18 +20,18 @@ class Task<R, S> implements TaskResults.Task<R, S> {
     public state: TaskState;
 
 
-    constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> = Q.defer<R>()) {
+    constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> | PsDeferred<R, S> = Q.defer<R>()) {
         this.name = name;
         this.state = TaskState.CREATED;
         this.action = action;
-        this.actionDfd = dfd;
+        this.actionDfd = <PsDeferred<R, S>><any>dfd;
         this.isPromise = Task.isPromise(action);
         this.result = undefined;
         this.error = undefined;
     }
 
 
-    public start(): Q.IPromise<R> {
+    public start(): PsPromise<R, S> {
         var that = this;
         if (this.state !== TaskState.CREATED) {
             throw new Error("task has already been started, cannot start task more than once");

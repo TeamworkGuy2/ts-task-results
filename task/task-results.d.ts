@@ -42,8 +42,6 @@ type _TaskState = TaskState;
  * @since 2017-08-06
  */
 interface Task<R, S> {
-    //new (name: string, action: (() => R) | Q.IPromise<R>, dfd?: Q.Deferred<R>): Task<R, S>;
-
     /** The current state of this task */
     readonly state: TaskState;
     /** The name of this task */
@@ -52,7 +50,7 @@ interface Task<R, S> {
     /** Start this task, can only be called once per task instance, subsequent calls throw an error
      * @returns a promise which completes or fails when the task completes or fails
      */
-    start(): Q.IPromise<R>;
+    start(): PsPromise<R, S>;
 
     /** Check whether the task has completed or failed */
     isSettled(): boolean;

@@ -1,6 +1,7 @@
 ﻿import chai = require("chai");
 import mocha = require("mocha");
 import Q = require("q");
+import Defer = require("ts-promises/Defer");
 import TaskSet = require("../task/TaskSet");
 import TaskState = require("../task/TaskState");
 
@@ -47,7 +48,7 @@ suite("TaskSet", function TaskSetTest() {
         var task1 = taskSet.startTask("task-res-1", createTaskRes1("success-1"));
         var task2 = taskSet.startTask("task-res-2", createTaskRes2("success-2", 10));
 
-        Q.all(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).done(function (res) {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
 
             asr.equal(task1.getResult(), "success-1");
@@ -71,7 +72,7 @@ suite("TaskSet", function TaskSetTest() {
         var task3 = taskSet.startTask("task-err-1", createTaskErr1("error-1"));
         var task4 = taskSet.startTask("task-err-2", createTaskErr2("error-2", 10));
 
-        Q.all(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).done(function (res) {
             asr.equal(true, false, "unexpected success");
             done();
         }, function (err) {
@@ -88,7 +89,7 @@ suite("TaskSet", function TaskSetTest() {
         taskSet.dropCompletedTasksPercentage = 0.25;
         startTasks(taskSet, "task-res-", "success-", 4);
 
-        Q.all(taskSet.getPromises()).then(function (res) {
+        Defer.when(taskSet.getPromises()).then(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();
         }).then(function () {
@@ -97,7 +98,7 @@ suite("TaskSet", function TaskSetTest() {
             taskSet.dropCompletedTasksPercentage = 0.6;
             startTasks(taskSet, "task-res-", "success-", 6);
 
-            return <Q.IPromise<string[]>>Q.all(taskSet.getPromises());
+            return <Q.IPromise<string[]>>Defer.when(taskSet.getPromises());
         }).done(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();

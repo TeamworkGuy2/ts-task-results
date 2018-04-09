@@ -1,5 +1,5 @@
 "use strict";
-var EnumCreator = require("../../ts-mortar/utils/EnumCreator");
+var EnumCreator = require("ts-mortar/utils/EnumCreator");
 /** TaskState enum for the status of a Task
  * @author TeamworkGuy2
  * @since 2016-5-24
