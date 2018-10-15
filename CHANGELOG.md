@@ -4,7 +4,16 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.3](https://github.com/TeamworkGuy2/ts-task-results/commit/6d5000d022636e38a8a378980be03d6bbd114d44) - 2018-04-09
+### [0.3.4](N/A) - 2018-10-14
+#### Changed
+* Update to TypeScript 3.1
+* Update dev dependencies and @types
+* Enable tsconfig.json strict and fix compile errors
+* Removed compiled bin tarball in favor of git tags and github releases
+
+
+--------
+### [0.3.3](https://github.com/TeamworkGuy2/ts-task-results/commit/2bfc413d8d1264086c99c203e7e6217ccae639f7) - 2018-04-09
 #### Changed
 * Update to TypeScript 2.8, fix issues related to ts-promises vs Q and TypeScript lib.d.ts promises.
 * Update tsconfig.json with `noImplicitReturns: true` and `forceConsistentCasingInFileNames: true`
