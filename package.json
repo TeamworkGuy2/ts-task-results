@@ -1,6 +1,6 @@
 {
   "name": "ts-task-results",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Task and result tracking, used to augment callback functions and return/throw code with trackable changes",
   "author": "TeamworkGuy2",
   "homepage": "https://github.com/TeamworkGuy2/ts-task-results",
@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@types/q": "~1.5.1",
-    "ts-mortar": "https://github.com/TeamworkGuy2/ts-mortar#v0.15.8",
-    "ts-promises": "https://github.com/TeamworkGuy2/ts-promises#v0.4.3",
+    "ts-mortar": "https://github.com/TeamworkGuy2/ts-mortar/archive/v0.15.8.tar.gz",
+    "ts-promises": "https://github.com/TeamworkGuy2/ts-promises/archive/v0.4.3.tar.gz",
     "q": "~1.5.0"
   },
   "devDependencies": {
