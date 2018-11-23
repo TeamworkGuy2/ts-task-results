@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project does its best to adhere to [Semantic Versioning](http://semver.org/).
 
+
+--------
+### [0.3.6](N/A) - 2018-11-23
+#### Changed
+* Update dependency `ts-mortar@0.15.9` (fix for `Functions.lazy()` when initializer returns null) and `ts-promises@0.4.4` (PsPromise.then() type improvement)
+
+
 --------
 ### [0.3.5](N/A) - 2018-10-20
 #### Changed
