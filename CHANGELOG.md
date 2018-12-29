@@ -4,13 +4,20 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.6](N/A) - 2018-11-23
+### [0.3.7](N/A) - 2018-12-29
+#### Changed
+* Update to TypeScript 3.2 and fix compile errors
+* Update @types dependencies
+
+
+--------
+### [0.3.6](https://github.com/TeamworkGuy2/ts-task-results/commit/db9c764c9b355a22b3c8e662071d6dd19d471d88) - 2018-11-23
 #### Changed
 * Update dependency `ts-mortar@0.15.9` (fix for `Functions.lazy()` when initializer returns null) and `ts-promises@0.4.4` (PsPromise.then() type improvement)
 
 
 --------
-### [0.3.5](N/A) - 2018-10-20
+### [0.3.5](https://github.com/TeamworkGuy2/ts-task-results/commit/be96bd112290672ed4da06adef1743ec8ac6501e) - 2018-10-20
 #### Changed
 * Switch `package.json` github dependencies from tag urls to release tarballs to simplify npm install (doesn't require git to npm install tarballs)
 
