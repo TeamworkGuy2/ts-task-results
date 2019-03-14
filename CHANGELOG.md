@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.7](N/A) - 2018-12-29
+### [0.3.8](N/A) - 2019-3-13
+#### Changed
+* Update dependency `ts-mortar@0.16.0` (fix for `Strings.isDigit()`, removal of `Objects.getProps()` and `Strings.endsWith()`, and several other changes)
+
+
+--------
+### [0.3.7](https://github.com/TeamworkGuy2/ts-task-results/commit/1061e14f9ecdfa55a55cbd7195897a6d106628d7) - 2018-12-29
 #### Changed
 * Update to TypeScript 3.2 and fix compile errors
 * Update @types dependencies
