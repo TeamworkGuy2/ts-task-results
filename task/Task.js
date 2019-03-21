@@ -14,7 +14,6 @@ var Task = /** @class */ (function () {
         this.state = TaskState.CREATED;
         this.action = action;
         this.actionDfd = dfd;
-        this.isPromise = Task.isPromise(action);
         this.result = undefined;
         this.error = undefined;
     }
@@ -23,6 +22,7 @@ var Task = /** @class */ (function () {
         if (this.state !== TaskState.CREATED) {
             throw new Error("task has already been started, cannot start task more than once");
         }
+        // resolve/reject run on next tick so 'action' functions that return immediately don't cause TaskSet.getPromises() to return bad results
         function taskCompleted(res) {
             that.state = TaskState.COMPLETED;
             that.result = res != null ? res : null;
@@ -34,7 +34,7 @@ var Task = /** @class */ (function () {
             that.actionDfd.reject(err);
         }
         this.state = TaskState.AWAITING_EXECUTION;
-        if (this.isPromise) {
+        if (Task.isPromise(this.action)) {
             this.state = TaskState.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
             this.action.then(taskCompleted, taskErrored);
         }

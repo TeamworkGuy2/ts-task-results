@@ -2,6 +2,7 @@
 import mocha = require("mocha");
 import Q = require("q");
 import Defer = require("ts-promises/Defer");
+import Tasks = require("../task/Tasks");
 import TaskSet = require("../task/TaskSet");
 import TaskState = require("../task/TaskState");
 
@@ -42,6 +43,42 @@ suite("TaskSet", function TaskSetTest() {
     }
 
 
+    test("README-example", function README_exampleTest(done) {
+        var taskSet = new TaskSet<string, string>(null, (name) => console.log("success:", name), (name) => console.log("failure:", name));
+        taskSet.startTask("task-1", Tasks.newTask<string, string>("a", () => "result a").start());
+        taskSet.startTask("task-2", Q.resolve<string>("result b"));
+        taskSet.startTask("task-3", Q.reject<string>("error c"));
+
+        Q.all(<PromiseLike<any>[]>taskSet.getPromises())
+            .then((results) => { console.log("done:", results); done(); }, (err) => { console.error("error:", err); done(); });
+    });
+
+
+    test("task-set-function-and-promise-task-mix", function taskSetFunctionAndPromiseTaskMixTest(done) {
+        var taskSet = new TaskSet<string, string>(null, null, null);
+        taskSet.startTask("task-1", () => "result a");
+        taskSet.startTask("task-2", Tasks.newTask<string, string>("b", () => "result b").start());
+        taskSet.startTask("task-3", Q.resolve<string>("result c"));
+        taskSet.startTask("task-4", Q.reject<string>("error d"));
+
+        asr.equal(taskSet.getTasks().size, 4);
+        asr.equal(taskSet.getPromises().length, taskSet.getTasks().size);
+
+        Q.all(<PromiseLike<any>[]>taskSet.getPromises()).done((results) => {
+            done("unexpected success");
+        }, (err) => {
+            Q.all(<PromiseLike<any>[]>taskSet.getPromises()).done((results) => {
+                var allResults = taskSet.getCompletedTasks().map((t) => t.task.getResult());
+                asr.deepEqual(allResults.sort(), ["result a", "result b", "result c"]);
+                asr.equal(err, "error d");
+                done();
+            }, (err2) => {
+                done("unexpected 2nd error");
+            });
+        });
+    });
+
+
     test("task-set-success", function taskSetSuccessTest(done) {
         // test success
         var taskSet = new TaskSet<string, string>();
@@ -58,8 +95,7 @@ suite("TaskSet", function TaskSetTest() {
             asr.equal(task2.state, TaskState.COMPLETED);
             done();
         }, function (err) {
-            asr.equal(true, false, "unexpected error");
-            done();
+            done("unexpected error");
         });
     });
 
@@ -73,10 +109,9 @@ suite("TaskSet", function TaskSetTest() {
         var task4 = taskSet.startTask("task-err-2", createTaskErr2("error-2", 10));
 
         Defer.when(taskSet.getPromises()).done(function (res) {
-            asr.equal(true, false, "unexpected success");
-            done();
+            done("unexpected success");
         }, function (err) {
-            asr.equal(true, err == "error-1" || err == "error-2");
+            asr.isTrue(err == "error-1" || err == "error-2");
             done();
         });
     });
@@ -104,8 +139,7 @@ suite("TaskSet", function TaskSetTest() {
             taskSet.clearCompletedTasks();
             done();
         }, function (err) {
-            asr.equal(false, true, "unexpected error");
-            done();
+            done("unexpected error");
         });
     });
 

@@ -19,9 +19,9 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
     private tasksInProgress: Map<string, TaskResults.Task<T, S>>;
     private tasksCompleted: { name: string; task: TaskResults.Task<T, S> }[];
     private tasksCompletedCount: number = 0;
-    private taskStartedCallback: ((taskName: string) => void) | undefined;
-    private taskCompletedCallback: ((taskName: string) => void) | undefined;
-    private taskFailedCallback: ((taskName: string) => void) | undefined;
+    private taskStartedCallback: ((taskName: string) => void) | null;
+    private taskCompletedCallback: ((taskName: string) => void) | null;
+    private taskFailedCallback: ((taskName: string) => void) | null;
 
 
     /** Create an empty task set with option started, completed, and failed callbacks
@@ -29,16 +29,16 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
      * @param [taskCompletedCb] a function to call when a task completes
      * @param [taskFailedCb] a function to call when a task fails
      */
-    constructor(taskStartedCb?: (taskName: string) => void, taskCompletedCb?: (taskName: string) => void, taskFailedCb?: (taskName: string) => void) {
+    constructor(taskStartedCb?: ((taskName: string) => void) | null, taskCompletedCb?: ((taskName: string) => void) | null, taskFailedCb?: ((taskName: string) => void) | null) {
         this.tasksInProgress = new Map<string, TaskResults.Task<T, S>>();
         this.tasksCompleted = [];
-        this.taskStartedCallback = taskStartedCb;
-        this.taskCompletedCallback = taskCompletedCb;
-        this.taskFailedCallback = taskFailedCb;
+        this.taskStartedCallback = taskStartedCb || null;
+        this.taskCompletedCallback = taskCompletedCb || null;
+        this.taskFailedCallback = taskFailedCb || null;
     }
 
 
-    public getTaskStartedCallback(): ((taskName: string) => void) | undefined {
+    public getTaskStartedCallback(): ((taskName: string) => void) | null {
         return this.taskStartedCallback;
     }
 
@@ -49,7 +49,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
     }
 
 
-    public getTaskCompletedCallback(): ((taskName: string) => void) | undefined {
+    public getTaskCompletedCallback(): ((taskName: string) => void) | null {
         return this.taskCompletedCallback;
     }
 
@@ -60,7 +60,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
     }
 
 
-    public getTaskFailedCallback(): ((taskName: string) => void) | undefined {
+    public getTaskFailedCallback(): ((taskName: string) => void) | null {
         return this.taskFailedCallback;
     }
 
@@ -112,9 +112,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
      */
     public getInProgressTasks(): { name: string; task: TaskResults.Task<T, S> }[] {
         var res: { name: string; task: TaskResults.Task<T, S> }[] = [];
-        this.tasksInProgress.forEach((task, name) => {
-            res.push({ name, task });
-        });
+        this.tasksInProgress.forEach((task, name) => res.push({ name, task }));
         return res;
     }
 

@@ -114,9 +114,9 @@ interface TaskSet<T, S> {
      */
     startTask(taskName: string, task: (() => T) | PsPromise<T, S>): TaskResults.Task<T, S>;
 
-    getTaskStartedCallback(): ((taskName: string) => void) | undefined;
-    getTaskCompletedCallback(): ((taskName: string) => void) | undefined;
-    getTaskFailedCallback(): ((taskName: string) => void) | undefined;
+    getTaskStartedCallback(): ((taskName: string) => void) | null;
+    getTaskCompletedCallback(): ((taskName: string) => void) | null;
+    getTaskFailedCallback(): ((taskName: string) => void) | null;
 
     setTaskStartedCallback(cb: (taskname: string) => void): void;
     setTaskCompletedCallback(cb: (taskname: string) => void): void;

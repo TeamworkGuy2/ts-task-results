@@ -4,7 +4,21 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.8](N/A) - 2019-3-13
+### [0.3.9](N/A) - 2019-3-20
+#### Added
+* Added README.md example
+* Added unit tests
+
+#### Changed
+* Switch `ts-mortar` and `ts-promises` dependencies from github to npm
+* `TaskSet` interface and class getTaskStartedCallback(), getTaskCompletedCallback(), and getTaskFailedCallback() return types changed from `((taskName: string) => void) | undefined` to `((taskName: string) => void) | null`
+
+#### Removed
+* `Task.isPromise` property in favor of a `Task.isPromise()` check inside `start()`
+
+
+--------
+### [0.3.8](https://github.com/TeamworkGuy2/ts-task-results/commit/09e6fdbce921b0a6c063b1036382a761a4a58da3) - 2019-3-13
 #### Changed
 * Update dependency `ts-mortar@0.16.0` (fix for `Strings.isDigit()`, removal of `Objects.getProps()` and `Strings.endsWith()`, and several other changes)
 
@@ -76,7 +90,7 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 * Rename `Task.status` -> `Task.state`
 * `Task` now `implements TaskResults.Task` interface
 * `TaskState` implements `TaskResults.TaskState` interface
-* Renamed `Task` `_status` -> `state` and `_name` -> `name` and removed `status` and `name` getters infavor of readonly properties behind TaskResults.Task interface, callers should no longer import Task directly, instead use the new Task.newTask() method
+* Renamed `Task` `_status` -> `state` and `_name` -> `name` and removed `status` and `name` getters in favor of readonly properties behind TaskResults.Task interface, callers should no longer import Task directly, instead use the new Task.newTask() method
 * Update to TypeScript 2.4 support
 
 

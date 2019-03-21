@@ -23,9 +23,9 @@ var TaskSet = /** @class */ (function () {
         this.tasksCompletedCount = 0;
         this.tasksInProgress = new Map();
         this.tasksCompleted = [];
-        this.taskStartedCallback = taskStartedCb;
-        this.taskCompletedCallback = taskCompletedCb;
-        this.taskFailedCallback = taskFailedCb;
+        this.taskStartedCallback = taskStartedCb || null;
+        this.taskCompletedCallback = taskCompletedCb || null;
+        this.taskFailedCallback = taskFailedCb || null;
     }
     TaskSet.prototype.getTaskStartedCallback = function () {
         return this.taskStartedCallback;
@@ -81,9 +81,7 @@ var TaskSet = /** @class */ (function () {
      */
     TaskSet.prototype.getInProgressTasks = function () {
         var res = [];
-        this.tasksInProgress.forEach(function (task, name) {
-            res.push({ name: name, task: task });
-        });
+        this.tasksInProgress.forEach(function (task, name) { return res.push({ name: name, task: task }); });
         return res;
     };
     /** All of the currently in-progress tasks

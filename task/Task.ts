@@ -11,7 +11,6 @@ class Task<R, S> implements TaskResults.Task<R, S> {
     public static isPromise: (obj: any) => obj is PromiseLike<any> = Q.isPromiseAlike;
 
     private action: (() => R) | Q.IPromise<R>;
-    private isPromise: boolean;
     private actionDfd: PsDeferred<R, S>;
     private result: R | null | undefined;
     private error: S | null | undefined;
@@ -25,7 +24,6 @@ class Task<R, S> implements TaskResults.Task<R, S> {
         this.state = TaskState.CREATED;
         this.action = action;
         this.actionDfd = <PsDeferred<R, S>><any>dfd;
-        this.isPromise = Task.isPromise(action);
         this.result = undefined;
         this.error = undefined;
     }
@@ -37,6 +35,7 @@ class Task<R, S> implements TaskResults.Task<R, S> {
             throw new Error("task has already been started, cannot start task more than once");
         }
 
+        // resolve/reject run on next tick so 'action' functions that return immediately don't cause TaskSet.getPromises() to return bad results
         function taskCompleted(res: R) {
             that.state = TaskState.COMPLETED;
             that.result = res != null ? res : null;
@@ -51,7 +50,7 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
         this.state = TaskState.AWAITING_EXECUTION;
 
-        if (this.isPromise) {
+        if (Task.isPromise(this.action)) {
             this.state = TaskState.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
             (<Q.IPromise<R>><any>this.action).then(taskCompleted, taskErrored);
         }
