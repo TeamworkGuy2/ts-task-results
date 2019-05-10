@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.9](N/A) - 2019-3-20
+### [0.3.10](N/A) - 2019-05-10
+#### Changed
+* Removed package.json `@types/node` dependency, added tsconfig.json lib `dom`
+
+
+--------
+### [0.3.9](https://github.com/TeamworkGuy2/ts-task-results/commit/68101ba730cc662d3a13f9b6006102e7e383f5d1) - 2019-03-20
 #### Added
 * Added README.md example
 * Added unit tests
@@ -18,7 +24,7 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.8](https://github.com/TeamworkGuy2/ts-task-results/commit/09e6fdbce921b0a6c063b1036382a761a4a58da3) - 2019-3-13
+### [0.3.8](https://github.com/TeamworkGuy2/ts-task-results/commit/09e6fdbce921b0a6c063b1036382a761a4a58da3) - 2019-03-13
 #### Changed
 * Update dependency `ts-mortar@0.16.0` (fix for `Strings.isDigit()`, removal of `Objects.getProps()` and `Strings.endsWith()`, and several other changes)
 
