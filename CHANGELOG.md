@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.10](N/A) - 2019-05-10
+### [0.3.11](N/A) - 2019-05-17
+#### Changed
+* Update dependency `ts-mortar@0.17.0` (Arrays fixes/cleanup)
+
+
+--------
+### [0.3.10](https://github.com/TeamworkGuy2/ts-task-results/commit/b4b615d77c8ccb3980c811f2a697626bb7aab91e) - 2019-05-10
 #### Changed
 * Removed package.json `@types/node` dependency, added tsconfig.json lib `dom`
 
