@@ -5,7 +5,6 @@ var Q = require("q");
 var Defer = require("ts-promises/Defer");
 var Tasks = require("../task/Tasks");
 var TaskSet = require("../task/TaskSet");
-var TaskState = require("../task/TaskState");
 var asr = chai.assert;
 suite("TaskSet", function TaskSetTest() {
     function createTaskRes1(res) {
@@ -69,9 +68,9 @@ suite("TaskSet", function TaskSetTest() {
         Defer.when(taskSet.getPromises()).done(function (res) {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
             asr.equal(task1.getResult(), "success-1");
-            asr.equal(task1.state, TaskState.COMPLETED);
+            asr.equal(task1.state, "COMPLETED");
             asr.equal(task2.getResult(), "success-2");
-            asr.equal(task2.state, TaskState.COMPLETED);
+            asr.equal(task2.state, "COMPLETED");
             done();
         }, function (err) {
             done("unexpected error");

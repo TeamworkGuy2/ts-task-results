@@ -71,7 +71,7 @@ var TaskSet = /** @class */ (function () {
     TaskSet.prototype.isRunning = function (taskName) {
         if (taskName != null) {
             var task = this.tasksInProgress.get(taskName);
-            return task != null ? task.state.isRunning() : false;
+            return task != null ? Task.isRunning(task.state) : false;
         }
         else {
             return this.tasksInProgress.size > 0;

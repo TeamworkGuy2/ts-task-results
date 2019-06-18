@@ -1,5 +1,4 @@
 ﻿import Q = require("q");
-import TaskState = require("./TaskState");
 
 /** Task implementation for a synchronous or asynchronous task
  * @template R the type of data returned by this task if it succeeds
@@ -21,7 +20,7 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
     constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> | PsDeferred<R, S> = Q.defer<R>()) {
         this.name = name;
-        this.state = TaskState.CREATED;
+        this.state = "CREATED";
         this.action = action;
         this.actionDfd = <PsDeferred<R, S>><any>dfd;
         this.result = undefined;
@@ -31,32 +30,32 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
     public start(): PsPromise<R, S> {
         var that = this;
-        if (this.state !== TaskState.CREATED) {
+        if (this.state !== "CREATED") {
             throw new Error("task has already been started, cannot start task more than once");
         }
 
         // resolve/reject run on next tick so 'action' functions that return immediately don't cause TaskSet.getPromises() to return bad results
         function taskCompleted(res: R) {
-            that.state = TaskState.COMPLETED;
+            that.state = "COMPLETED";
             that.result = res != null ? res : null;
             that.actionDfd.resolve(res);
         }
 
         function taskErrored(err: any) {
-            that.state = TaskState.ERRORED;
+            that.state = "ERRORED";
             that.error = err != null ? err : null;
             that.actionDfd.reject(err);
         }
 
-        this.state = TaskState.AWAITING_EXECUTION;
+        this.state = "AWAITING_EXECUTION";
 
         if (Task.isPromise(this.action)) {
-            this.state = TaskState.RUNNING; // TODO technically incorrect, we don't know when the task will run in the browser/node/rhino/etc.
+            this.state = "RUNNING"; // TODO technically incorrect, we don't know when the task will run in the browser/node/other.
             (<Q.IPromise<R>><any>this.action).then(taskCompleted, taskErrored);
         }
         else {
             try {
-                this.state = TaskState.RUNNING;
+                this.state = "RUNNING";
                 var res = (<() => R><any>this.action)();
                 taskCompleted(res);
             } catch (e) {
@@ -69,7 +68,7 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
 
     public isSettled(): boolean {
-        return this.state.isSettled();
+        return Task.isSettled(this.state);
     }
 
 
@@ -85,6 +84,16 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
     public getError(): S | null | undefined {
         return this.error;
+    }
+
+
+    public static isSettled(state: TaskState): state is TaskStateSettled {
+        return state === "CANCELED" || state === "ERRORED" || state === "COMPLETED";
+    }
+
+
+    public static isRunning(state: TaskState): state is TaskStateRunning {
+        return state === "RUNNING" || state === "AWAITING_SCHEDULING" || state === "AWAITING_CHILDREN_COMPLETION" || state === "AWAITING_EXECUTION";
     }
 
 }

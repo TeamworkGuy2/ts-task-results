@@ -25,14 +25,16 @@ interface ResultsAndErrors<R, E> {
 
 /** The state of a task (whether it is executing, awaiting execution, paused, completed, failed, canceled, etc)
  */
-interface TaskState {
-    /** True indicates a state of completion/failure/cancelation, false indicates any other state */
-    isSettled(): boolean;
-    /** True indicates a state of running/execution, false indicates any other state */
-    isRunning(): boolean;
-}
-
+type TaskState = "CANCELED" | "CREATED" | "ERRORED" | "COMPLETED" | "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_CHILDREN_COMPLETION" | "AWAITING_EXECUTION";
 type _TaskState = TaskState;
+
+/** True indicates a state of completion/failure/cancelation, false indicates any other state
+ */
+type TaskStateSettled = "CANCELED" | "ERRORED" | "COMPLETED";
+
+/** True indicates a state of running/execution, false indicates any other state
+ */
+type TaskStateRunning = "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_CHILDREN_COMPLETION" | "AWAITING_EXECUTION";
 
 
 /** Task interface for executing and monitoring the state and result/failure of a synchronous or asynchronous task

@@ -4,7 +4,20 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.11](N/A) - 2019-05-17
+### [0.4.0](N/A) - 2019-06-17
+#### Added
+* Static `Task.isRunning()` and `Task.isSettled()` methods
+
+#### Changed
+* `TaskState` interface is now a string literal union type of possible `Task.state` options
+* Update to TypeScript 3.5 and fix compile errors
+
+#### Removed
+* `TaskState` in favor of just using strings and `Task.isRunning()` and `Task.isSettled()`
+
+
+--------
+### [0.3.11](https://github.com/TeamworkGuy2/ts-task-results/commit/bdc8a685ae91c4e2868af664e60c3a5008bbc432) - 2019-05-17
 #### Changed
 * Update dependency `ts-mortar@0.17.0` (Arrays fixes/cleanup)
 

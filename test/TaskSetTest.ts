@@ -4,8 +4,6 @@ import Q = require("q");
 import Defer = require("ts-promises/Defer");
 import Tasks = require("../task/Tasks");
 import TaskSet = require("../task/TaskSet");
-import TaskState = require("../task/TaskState");
-
 
 var asr = chai.assert;
 
@@ -89,10 +87,10 @@ suite("TaskSet", function TaskSetTest() {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
 
             asr.equal(task1.getResult(), "success-1");
-            asr.equal(task1.state, TaskState.COMPLETED);
+            asr.equal(task1.state, "COMPLETED");
 
             asr.equal(task2.getResult(), "success-2");
-            asr.equal(task2.state, TaskState.COMPLETED);
+            asr.equal(task2.state, "COMPLETED");
             done();
         }, function (err) {
             done("unexpected error");

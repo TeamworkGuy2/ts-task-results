@@ -1,5 +1,4 @@
-﻿import Defer = require("ts-promises/Defer");
-import Task = require("./Task");
+﻿import Task = require("./Task");
 
 /** A set of tasks where all tasks return the same result type.
  * The advantage of a TaskSet over a Promise[] is that a task set provides listeners for start, completion, and failure events to be intercepted for logging or other purposes
@@ -100,7 +99,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
     public isRunning(taskName?: string): boolean {
         if (taskName != null) {
             var task = this.tasksInProgress.get(taskName);
-            return task != null ? task.state.isRunning() : false;
+            return task != null ? Task.isRunning(task.state) : false;
         }
         else {
             return this.tasksInProgress.size > 0;

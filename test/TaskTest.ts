@@ -1,8 +1,6 @@
 ﻿import chai = require("chai");
 import mocha = require("mocha");
 import Tasks = require("../task/Tasks");
-import TaskState = require("../task/TaskState");
-
 
 var asr = chai.assert;
 
@@ -14,12 +12,12 @@ suite("Task", function TaskTest() {
         var res1 = Tasks.newTask("a", () => "a-success");
 
         asr.equal(res1.name, "a");
-        asr.equal(res1.state, TaskState.CREATED);
+        asr.equal(res1.state, "CREATED");
 
         res1.getPromise().then((res) => {
             asr.equal(res, "a-success");
             asr.equal(res1.getResult(), "a-success");
-            asr.equal(res1.state, TaskState.COMPLETED);
+            asr.equal(res1.state, "COMPLETED");
             done();
         }, (err) => {
             asr.equal(true, false, "task " + res1.name + " failed unexpectedly");
@@ -35,7 +33,7 @@ suite("Task", function TaskTest() {
         var res1 = Tasks.newTask("a", () => { throw "a-error"; });
 
         asr.equal(res1.name, "a");
-        asr.equal(res1.state, TaskState.CREATED);
+        asr.equal(res1.state, "CREATED");
 
         res1.getPromise().then((res) => {
             asr.equal(true, false, "task " + res1.name + " succeeded unexpectedly");
@@ -43,7 +41,7 @@ suite("Task", function TaskTest() {
         }, (err) => {
             asr.equal(err, "a-error");
             asr.equal(res1.getError(), "a-error");
-            asr.equal(res1.state, TaskState.ERRORED);
+            asr.equal(res1.state, "ERRORED");
             done();
         });
 

@@ -3,7 +3,6 @@ TypeScript Task Results
 
 Dependencies:
 * Q.js
-* ts-mortar
 * ts-promises
 
 Manage task groups which can be functions and/or promises.
