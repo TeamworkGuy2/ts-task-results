@@ -1,6 +1,6 @@
 {
   "name": "ts-task-results",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Task and result tracking, used to augment callback functions and return/throw code with trackable changes",
   "author": "TeamworkGuy2",
   "homepage": "https://github.com/TeamworkGuy2/ts-task-results",
@@ -12,15 +12,15 @@
   },
   "dependencies": {
     "@types/q": "~1.5.1",
-    "ts-promises": "~0.5.0",
+    "ts-promises": "~0.5.2",
     "q": "~1.5.0"
   },
   "devDependencies": {
-    "@types/chai": "~4.1.7",
-    "@types/mocha": "~5.2.5",
+    "@types/chai": "~4.2.4",
+    "@types/mocha": "~5.2.7",
     "chai": "~4.2.0",
     "mocha": "~5.2.0",
-    "typescript": "~3.5.2"
+    "typescript": "~3.7.2"
   },
   "scripts": {
     "test": "node node_modules/mocha/bin/_mocha -u tdd --recursive",

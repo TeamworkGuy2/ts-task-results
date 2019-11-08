@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.4.0](N/A) - 2019-06-17
+### [0.4.1](N/A) - 2019-11-08
+#### Changed
+* Update to TypeScript 3.7
+
+
+--------
+### [0.4.0](https://github.com/TeamworkGuy2/ts-task-results/commit/086270b27c3522a9eeb97864ac698d961b1a021b) - 2019-06-17
 #### Added
 * Static `Task.isRunning()` and `Task.isSettled()` methods
 
