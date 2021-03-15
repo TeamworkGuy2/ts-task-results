@@ -4,7 +4,19 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.5.0](N/A) - 2020-09-05
+### [0.6.0](N/A) - 2021-03-14
+#### Changed
+* Refactored `Task`, remove public constructor and `start()` is no longer part of the interface, use `Task.startTask()` instead to create and start a task in one action
+* `Task` constructor and `TaskSet.startTask()` only take `PsPromise`, functions and `Q.IPromise` are no longer supported
+* `Tasks.newTask()` renamed `Tasks.startTask()` and changed to start the task as well, can no longer create a task instance without starting it
+
+#### Removed
+* `Q` dependency in favor of requiring promises for all task operations
+* Public `Task` constructor, use `Task.startTask()` instead
+
+
+--------
+### [0.5.0](https://github.com/TeamworkGuy2/ts-task-results/commit/9e52086199b15053dd10cfe03b870828f8320946) - 2020-09-05
 #### Changed
 * Update to TypeScript 4.0
 

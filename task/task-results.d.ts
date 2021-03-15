@@ -1,5 +1,4 @@
-﻿/// <reference types="q" />
-/// <reference path="../../ts-promises/ts-promises.d.ts" />
+﻿/// <reference path="../../ts-promises/ts-promises.d.ts" />
 
 /** A task result containing either a return value or an error
  * @template R the result type
@@ -25,7 +24,7 @@ interface ResultsAndErrors<R, E> {
 
 /** The state of a task (whether it is executing, awaiting execution, paused, completed, failed, canceled, etc)
  */
-type TaskState = "CANCELED" | "CREATED" | "ERRORED" | "COMPLETED" | "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_CHILDREN_COMPLETION" | "AWAITING_EXECUTION";
+type TaskState = "CANCELED" | "CREATED" | "ERRORED" | "COMPLETED" | "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_EXECUTION";
 type _TaskState = TaskState;
 
 /** True indicates a state of completion/failure/cancelation, false indicates any other state
@@ -34,7 +33,7 @@ type TaskStateSettled = "CANCELED" | "ERRORED" | "COMPLETED";
 
 /** True indicates a state of running/execution, false indicates any other state
  */
-type TaskStateRunning = "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_CHILDREN_COMPLETION" | "AWAITING_EXECUTION";
+type TaskStateRunning = "RUNNING" | "AWAITING_SCHEDULING" | "AWAITING_EXECUTION";
 
 
 /** Task interface for executing and monitoring the state and result/failure of a synchronous or asynchronous task
@@ -48,11 +47,6 @@ interface Task<R, S> {
     readonly state: TaskState;
     /** The name of this task */
     readonly name: string;
-
-    /** Start this task, can only be called once per task instance, subsequent calls throw an error
-     * @returns a promise which completes or fails when the task completes or fails
-     */
-    start(): PsPromise<R, S>;
 
     /** Check whether the task has completed or failed */
     isSettled(): boolean;
@@ -126,6 +120,23 @@ interface TaskSet<T, S> {
 }
 
 type _TaskSet<T, S> = TaskSet<T, S>;
+
+
+interface IDeferred<T> {
+    promise: PromiseLike<T>;
+
+    /** Calling resolve with a pending promise causes promise to wait on the passed promise, becoming fulfilled with its
+     * fulfillment value or rejected with its rejection reason (or staying pending forever, if the passed promise does).
+     * Calling resolve with a rejected promise causes promise to be rejected with the passed promise's rejection reason.
+     * Calling resolve with a fulfilled promise causes promise to be fulfilled with the passed promise's fulfillment value.
+     * Calling resolve with a non-promise value causes promise to be fulfilled with that value.
+     */
+    resolve(value?: PromiseLike<T> | T): void;
+
+    /** Calling reject with a reason causes promise to be rejected with that reason.
+     */
+    reject(reason?: any): void;
+}
 
 
 declare module TaskResults {

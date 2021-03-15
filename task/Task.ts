@@ -1,5 +1,4 @@
-﻿import Q = require("q");
-
+﻿
 /** Task implementation for a synchronous or asynchronous task
  * @template R the type of data returned by this task if it succeeds
  * @template S the type of error throw by this task if it fails
@@ -7,10 +6,8 @@
  * @since 2016-5-24
  */
 class Task<R, S> implements TaskResults.Task<R, S> {
-    public static isPromise: (obj: any) => obj is PromiseLike<any> = Q.isPromiseAlike;
-
-    private action: (() => R) | Q.IPromise<R>;
-    private actionDfd: PsDeferred<R, S>;
+    private originalAction: PsPromise<R, S>;
+    private action: PsPromise<R, S>;
     private result: R | null | undefined;
     private error: S | null | undefined;
 
@@ -18,16 +15,19 @@ class Task<R, S> implements TaskResults.Task<R, S> {
     public state: TaskState;
 
 
-    constructor(name: string, action: (() => R) | Q.IPromise<R>, dfd: Q.Deferred<R> | PsDeferred<R, S> = Q.defer<R>()) {
+    private constructor(name: string, action: PsPromise<R, S>) {
         this.name = name;
         this.state = "CREATED";
+        this.originalAction = action;
         this.action = action;
-        this.actionDfd = <PsDeferred<R, S>><any>dfd;
         this.result = undefined;
         this.error = undefined;
     }
 
 
+    /** Start this task, can only be called once per task instance, subsequent calls throw an error.
+     * @returns a promise which completes or fails when the task completes or fails
+     */
     public start(): PsPromise<R, S> {
         var that = this;
         if (this.state !== "CREATED") {
@@ -38,32 +38,20 @@ class Task<R, S> implements TaskResults.Task<R, S> {
         function taskCompleted(res: R) {
             that.state = "COMPLETED";
             that.result = res != null ? res : null;
-            that.actionDfd.resolve(res);
+            return res;
         }
 
-        function taskErrored(err: any) {
+        function taskErrored(err: S): Throws<S> {
             that.state = "ERRORED";
             that.error = err != null ? err : null;
-            that.actionDfd.reject(err);
+            throw err;
         }
 
         this.state = "AWAITING_EXECUTION";
 
-        if (Task.isPromise(this.action)) {
-            this.state = "RUNNING"; // TODO technically incorrect, we don't know when the task will run in the browser/node/other.
-            (<Q.IPromise<R>><any>this.action).then(taskCompleted, taskErrored);
-        }
-        else {
-            try {
-                this.state = "RUNNING";
-                var res = (<() => R><any>this.action)();
-                taskCompleted(res);
-            } catch (e) {
-                taskErrored(e);
-            }
-        }
-
-        return this.actionDfd.promise;
+        this.state = "RUNNING"; // TODO technically incorrect, we don't know when the task will run in the browser/node/other.
+        this.action = <PsPromise<any, any>>this.action.then(taskCompleted, taskErrored);
+        return this.action;
     }
 
 
@@ -73,7 +61,7 @@ class Task<R, S> implements TaskResults.Task<R, S> {
 
 
     public getPromise(): PsPromise<R, S> {
-        return this.actionDfd.promise;
+        return this.action;
     }
 
 
@@ -87,13 +75,30 @@ class Task<R, S> implements TaskResults.Task<R, S> {
     }
 
 
+    /** Create and start a task
+     * @param name the name of the task
+     * @param action the unit of work performed by this task, a function or promise 
+     * @param dfd IDeferred for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
+     */
+    public static startTask<R1, S1>(name: string, action: PsPromise<R1, S1>): TaskResults.Task<R1, S1> {
+        var task = new Task<R1, S1>(name, action);
+        task.start();
+        return task;
+    }
+
+
     public static isSettled(state: TaskState): state is TaskStateSettled {
         return state === "CANCELED" || state === "ERRORED" || state === "COMPLETED";
     }
 
 
     public static isRunning(state: TaskState): state is TaskStateRunning {
-        return state === "RUNNING" || state === "AWAITING_SCHEDULING" || state === "AWAITING_CHILDREN_COMPLETION" || state === "AWAITING_EXECUTION";
+        return state === "RUNNING" || state === "AWAITING_SCHEDULING" || state === "AWAITING_EXECUTION";
+    }
+
+
+    public static isPromise(obj: any): obj is PromiseLike<any> {
+        return obj === Object(obj) && typeof obj.then === "function";
     }
 
 }

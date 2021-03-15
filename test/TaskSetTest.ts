@@ -7,34 +7,34 @@ import TaskSet = require("../task/TaskSet");
 
 var asr = chai.assert;
 
-
 suite("TaskSet", function TaskSetTest() {
 
     function createTaskRes1<E1>(res: E1) {
-        return () => res;
+        return <PsPromise<E1, any>>Q.resolve(res);
     }
 
     function createTaskRes2<E1>(res: E1, waitMillis: number) {
         var dfd = Q.defer<E1>();
         setTimeout(() => dfd.resolve(res), waitMillis);
-        return dfd.promise;
+        return <PsPromise<E1, any>>dfd.promise;
     }
 
     function createTaskErr1<E1>(res: E1) {
-        return () => res;
+        return <PsPromise<any, E1>>Q.reject(res);
     }
 
     function createTaskErr2<E1>(res: E1, waitMillis: number) {
         var dfd = Q.defer<E1>();
         setTimeout(() => dfd.reject(res), waitMillis);
-        return dfd.promise;
+        return <PsPromise<any, E1>>dfd.promise;
     }
 
 
     function startTasks(taskSet: TaskSet<string, string>, namePrefix: string, resMsgPrefix: string, count: number): Task<string, string>[] {
         var tasks: Task<string, string>[] = [];
         for (var i = 0; i < count; i++) {
-            var t = taskSet.startTask(namePrefix + i, Math.random() < 0.5 ? createTaskRes1(resMsgPrefix + i) : createTaskRes2(resMsgPrefix + i, Math.round(Math.random() * 10)));
+            var rr = Math.random() < 0.5 ? createTaskRes1(resMsgPrefix + i) : createTaskRes2(resMsgPrefix + i, Math.round(Math.random() * 10));
+            var t = taskSet.startTask(namePrefix + i, rr);
             tasks.push(t);
         }
         return tasks;
@@ -43,9 +43,9 @@ suite("TaskSet", function TaskSetTest() {
 
     test("README-example", function README_exampleTest(done) {
         var taskSet = new TaskSet<string, string>(null, (name) => console.log("success:", name), (name) => console.log("failure:", name));
-        taskSet.startTask("task-1", Tasks.newTask<string, string>("a", () => "result a").start());
-        taskSet.startTask("task-2", Q.resolve<string>("result b"));
-        taskSet.startTask("task-3", Q.reject<string>("error c"));
+        taskSet.startTask("task-1", Tasks.startTask<string, string>("a", createTaskRes1("result a")).getPromise());
+        taskSet.startTask("task-2", createTaskRes1("result b"));
+        taskSet.startTask("task-3", createTaskRes1("error c"));
 
         Q.all(<PromiseLike<any>[]>taskSet.getPromises())
             .then((results) => { console.log("done:", results); done(); }, (err) => { console.error("error:", err); done(); });
@@ -54,10 +54,10 @@ suite("TaskSet", function TaskSetTest() {
 
     test("task-set-function-and-promise-task-mix", function taskSetFunctionAndPromiseTaskMixTest(done) {
         var taskSet = new TaskSet<string, string>(null, null, null);
-        taskSet.startTask("task-1", () => "result a");
-        taskSet.startTask("task-2", Tasks.newTask<string, string>("b", () => "result b").start());
-        taskSet.startTask("task-3", Q.resolve<string>("result c"));
-        taskSet.startTask("task-4", Q.reject<string>("error d"));
+        taskSet.startTask("task-1", createTaskRes1("result a"));
+        taskSet.startTask("task-2", Tasks.startTask<string, string>("b", createTaskRes1("result b")).getPromise());
+        taskSet.startTask("task-3", createTaskRes1("result c"));
+        taskSet.startTask("task-4", createTaskErr1("error d"));
 
         asr.equal(taskSet.getTasks().size, 4);
         asr.equal(taskSet.getPromises().length, taskSet.getTasks().size);
@@ -83,7 +83,7 @@ suite("TaskSet", function TaskSetTest() {
         var task1 = taskSet.startTask("task-res-1", createTaskRes1("success-1"));
         var task2 = taskSet.startTask("task-res-2", createTaskRes2("success-2", 10));
 
-        Defer.when(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).then(function (res) {
             asr.deepEqual(res.sort(), ["success-1", "success-2"]);
 
             asr.equal(task1.getResult(), "success-1");
@@ -106,7 +106,7 @@ suite("TaskSet", function TaskSetTest() {
         var task3 = taskSet.startTask("task-err-1", createTaskErr1("error-1"));
         var task4 = taskSet.startTask("task-err-2", createTaskErr2("error-2", 10));
 
-        Defer.when(taskSet.getPromises()).done(function (res) {
+        Defer.when(taskSet.getPromises()).then(function (res) {
             done("unexpected success");
         }, function (err) {
             asr.isTrue(err == "error-1" || err == "error-2");
@@ -132,7 +132,7 @@ suite("TaskSet", function TaskSetTest() {
             startTasks(taskSet, "task-res-", "success-", 6);
 
             return <Q.IPromise<string[]>>Defer.when(taskSet.getPromises());
-        }).done(function (res) {
+        }).then(function (res) {
             asr.equal(taskSet.getCompletedTasks().length, 2);
             taskSet.clearCompletedTasks();
             done();

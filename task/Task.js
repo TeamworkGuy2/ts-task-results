@@ -1,5 +1,4 @@
 "use strict";
-var Q = require("q");
 /** Task implementation for a synchronous or asynchronous task
  * @template R the type of data returned by this task if it succeeds
  * @template S the type of error throw by this task if it fails
@@ -7,15 +6,17 @@ var Q = require("q");
  * @since 2016-5-24
  */
 var Task = /** @class */ (function () {
-    function Task(name, action, dfd) {
-        if (dfd === void 0) { dfd = Q.defer(); }
+    function Task(name, action) {
         this.name = name;
         this.state = "CREATED";
+        this.originalAction = action;
         this.action = action;
-        this.actionDfd = dfd;
         this.result = undefined;
         this.error = undefined;
     }
+    /** Start this task, can only be called once per task instance, subsequent calls throw an error.
+     * @returns a promise which completes or fails when the task completes or fails
+     */
     Task.prototype.start = function () {
         var that = this;
         if (this.state !== "CREATED") {
@@ -25,35 +26,23 @@ var Task = /** @class */ (function () {
         function taskCompleted(res) {
             that.state = "COMPLETED";
             that.result = res != null ? res : null;
-            that.actionDfd.resolve(res);
+            return res;
         }
         function taskErrored(err) {
             that.state = "ERRORED";
             that.error = err != null ? err : null;
-            that.actionDfd.reject(err);
+            throw err;
         }
         this.state = "AWAITING_EXECUTION";
-        if (Task.isPromise(this.action)) {
-            this.state = "RUNNING"; // TODO technically incorrect, we don't know when the task will run in the browser/node/other.
-            this.action.then(taskCompleted, taskErrored);
-        }
-        else {
-            try {
-                this.state = "RUNNING";
-                var res = this.action();
-                taskCompleted(res);
-            }
-            catch (e) {
-                taskErrored(e);
-            }
-        }
-        return this.actionDfd.promise;
+        this.state = "RUNNING"; // TODO technically incorrect, we don't know when the task will run in the browser/node/other.
+        this.action = this.action.then(taskCompleted, taskErrored);
+        return this.action;
     };
     Task.prototype.isSettled = function () {
         return Task.isSettled(this.state);
     };
     Task.prototype.getPromise = function () {
-        return this.actionDfd.promise;
+        return this.action;
     };
     Task.prototype.getResult = function () {
         return this.result;
@@ -61,13 +50,25 @@ var Task = /** @class */ (function () {
     Task.prototype.getError = function () {
         return this.error;
     };
+    /** Create and start a task
+     * @param name the name of the task
+     * @param action the unit of work performed by this task, a function or promise
+     * @param dfd IDeferred for tracking the completion/failure of the task, if not provided a default will be created using 'Q.defer()'
+     */
+    Task.startTask = function (name, action) {
+        var task = new Task(name, action);
+        task.start();
+        return task;
+    };
     Task.isSettled = function (state) {
         return state === "CANCELED" || state === "ERRORED" || state === "COMPLETED";
     };
     Task.isRunning = function (state) {
-        return state === "RUNNING" || state === "AWAITING_SCHEDULING" || state === "AWAITING_CHILDREN_COMPLETION" || state === "AWAITING_EXECUTION";
+        return state === "RUNNING" || state === "AWAITING_SCHEDULING" || state === "AWAITING_EXECUTION";
     };
-    Task.isPromise = Q.isPromiseAlike;
+    Task.isPromise = function (obj) {
+        return obj === Object(obj) && typeof obj.then === "function";
+    };
     return Task;
 }());
 module.exports = Task;

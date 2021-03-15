@@ -136,7 +136,7 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
      * @param taskName the name of the task
      * @param taskPromise the promise which the new task will be based on, when this promise completes/fails, the task will complete/fail
      */
-    public startTask(taskName: string, task: (() => T) | Q.IPromise<T> | PsPromise<T, S>): TaskResults.Task<T, S> {
+    public startTask(taskName: string, task: PsPromise<T, S>): TaskResults.Task<T, S> {
         var that = this;
 
         function taskDone<R1>(res: R1): R1 {
@@ -159,20 +159,10 @@ class TaskSet<T, S> implements TaskResults.TaskSet<T, S> {
         }
 
         // handle promises or functions
-        var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : <() => T>function taskWrapper() {
-            try {
-                var res = (<() => T>task)();
-                return taskDone(res);
-            } catch (e) {
-                taskError(e);
-            }
-            return undefined;
-        };
+        var taskWrapped = task.then(taskDone, taskError);
 
         // create and start the task
-        var newTask = new Task<T, S>(taskName, taskWrapped);
-
-        newTask.start();
+        var newTask = Task.startTask<T, S>(taskName, taskWrapped);
 
         this.tasksInProgress.set(taskName, newTask);
         this.callTaskStarted(taskName);

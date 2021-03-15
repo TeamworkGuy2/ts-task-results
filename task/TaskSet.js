@@ -117,19 +117,9 @@ var TaskSet = /** @class */ (function () {
             throw err;
         }
         // handle promises or functions
-        var taskWrapped = Task.isPromise(task) ? task.then(taskDone, taskError) : function taskWrapper() {
-            try {
-                var res = task();
-                return taskDone(res);
-            }
-            catch (e) {
-                taskError(e);
-            }
-            return undefined;
-        };
+        var taskWrapped = task.then(taskDone, taskError);
         // create and start the task
-        var newTask = new Task(taskName, taskWrapped);
-        newTask.start();
+        var newTask = Task.startTask(taskName, taskWrapped);
         this.tasksInProgress.set(taskName, newTask);
         this.callTaskStarted(taskName);
         return newTask;
