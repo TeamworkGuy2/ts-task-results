@@ -2,18 +2,17 @@ TypeScript Task Results
 ==============
 
 Dependencies:
-* Q.js
 * ts-promises
 
 Manage task groups which can be functions and/or promises.
 Example:
 ```ts
-var Q = require("q");
+var Q = require("q"); // for async tasks, can also use native 'Promise'
 var Tasks = require("ts-task-results/task/Tasks");
 var TaskSet = require("ts-task-results/task/TaskSet");
 
 var taskSet = new TaskSet<string, string>(null, (name) => console.log("success:", name), (name) => console.log("failure:", name));
-taskSet.startTask("task-1", Tasks.newTask<string, string>("a", () => "result a").start());
+taskSet.startTask("task-1", Tasks.startTask<string, string>("a", () => "result a"));
 taskSet.startTask("task-2", Q.resolve<string>("result b"));
 taskSet.startTask("task-3", Q.reject<string>("error c"));
 
@@ -31,7 +30,7 @@ error: error c
 
 
 ### Tasks
-Static `newTask()` and `newTaskSet()` methods
+Static `startTask()` and `newTaskSet()` methods
 
 ### Task
 Wrapper for synchronous or asynchronous function or promise and tracking its status/completion

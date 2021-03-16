@@ -4,7 +4,16 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.0](N/A) - 2021-03-14
+### [0.6.1](N/A) - 2021-03-16
+#### Changed
+* Update `README.md` with `0.6.0` changes.
+
+#### Removed
+* Unused `IDeferred` from `task-results.d.ts`
+
+
+--------
+### [0.6.0](https://github.com/TeamworkGuy2/ts-task-results/commit/2d5d20aeec58d9d13b1980b54d45fcc91a59bcbd) - 2021-03-14
 #### Changed
 * Refactored `Task`, remove public constructor and `start()` is no longer part of the interface, use `Task.startTask()` instead to create and start a task in one action
 * `Task` constructor and `TaskSet.startTask()` only take `PsPromise`, functions and `Q.IPromise` are no longer supported

@@ -122,23 +122,6 @@ interface TaskSet<T, S> {
 type _TaskSet<T, S> = TaskSet<T, S>;
 
 
-interface IDeferred<T> {
-    promise: PromiseLike<T>;
-
-    /** Calling resolve with a pending promise causes promise to wait on the passed promise, becoming fulfilled with its
-     * fulfillment value or rejected with its rejection reason (or staying pending forever, if the passed promise does).
-     * Calling resolve with a rejected promise causes promise to be rejected with the passed promise's rejection reason.
-     * Calling resolve with a fulfilled promise causes promise to be fulfilled with the passed promise's fulfillment value.
-     * Calling resolve with a non-promise value causes promise to be fulfilled with that value.
-     */
-    resolve(value?: PromiseLike<T> | T): void;
-
-    /** Calling reject with a reason causes promise to be rejected with that reason.
-     */
-    reject(reason?: any): void;
-}
-
-
 declare module TaskResults {
     export type Task<R, S> = _Task<R, S>;
     export type TaskSet<R, S> = _TaskSet<R, S>;
